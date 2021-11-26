@@ -1,0 +1,46 @@
+{
+    "msg": "success",
+    "code": 200,
+    "page": {
+        "totalCount": 0,
+        "pageSize": 5,
+        "totalPage": 0,
+        "currPage": 1,
+        "list": [
+            {
+                "projectNumber": "lu202111",
+                "version": 2,
+                "projectName": "testLu",
+                "projectShorterName": "lu",
+                "contractAmountTotal": 30.0,
+                "contractAmountBuild": 0.0,
+                "contractAmountEquip": 30.0,
+                "incomeAmountTotal": 500.0,
+                "incomeAmountBuild": 300.0,
+                "incomeAmountEquip": 200.0,
+                "costAmountTotal": 90.0,
+                "costAmountBuild": 0.0,
+                "costAmountEquip": 50.0,
+                "profit": 0.0,
+                "createTime": "2021-11-25 10:11:38"
+            },
+            {
+                "projectNumber": "t20211119ABC",
+                "version": 4,
+                "projectName": "test01",
+                "projectShorterName": "ABC",
+                "contractAmountTotal": 30.4,
+                "contractAmountBuild": 10.2,
+                "contractAmountEquip": 20.2,
+                "incomeAmountTotal": 0.0,
+                "incomeAmountBuild": 0.0,
+                "incomeAmountEquip": 0.0,
+                "costAmountTotal": 22.0,
+                "costAmountBuild": 22.0,
+                "costAmountEquip": 0.0,
+                "profit": 8.4,
+                "createTime": "0000-00-00 00:00:00"
+            }
+        ]
+    }
+}

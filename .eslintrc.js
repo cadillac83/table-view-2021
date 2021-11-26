@@ -22,7 +22,9 @@ module.exports = {
         "#": "prettier config in here :)",
         singleQuote: true,
         semi: false,
-        trailingComma: "none"
+        trailingComma: "none",
+        printWidth:1000,
+        tabWidth:4
       }
     ],
     'vue/max-attributes-per-line': [
@@ -98,7 +100,7 @@ module.exports = {
     'handle-callback-err': [2, '^(err|error)$'],
     indent: [
       2,
-      2,
+      4,
       {
         SwitchCase: 1,
       },

@@ -5,11 +5,13 @@ import router from './router'
 // import store from './store'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import axios from 'axios'
 
-// createApp(App).use(store).use(router).use(ElementPlus).mount('#app')
 const app = createApp(App)
+app.config.globalProperties = axios
 
 app.use(router)
-// app.use(store)
-app.use(ElementPlus)
-app.mount('#app')
+    // .use(store)
+    .use(ElementPlus)
+    .mount('#app')
+console.log('app', app)

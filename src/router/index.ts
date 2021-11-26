@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import TableView from "../components/TableView.vue";
+import TableView from "../views/TableView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
