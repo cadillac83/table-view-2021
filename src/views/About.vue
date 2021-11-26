@@ -125,8 +125,9 @@
         </el-form-item>
         <el-form-item label="主合同金额" prop="mainContractAmount">
           <el-row>
-            <el-input v-model="form.mainContractAmount.total">
-              <template #prepend>总额</template></el-input
+            <el-input
+v-model="form.mainContractAmount.total"
+              ><template #prepend>总额</template></el-input
             >
           </el-row>
           <el-row>
@@ -136,22 +137,25 @@
               >
             </el-col>
             <el-col :span="8">
-              <el-input v-model="form.mainContractAmount.equipmentProcurement">
-                <template #prepend>设备采购</template>
-              </el-input>
+              <el-input
+v-model="form.mainContractAmount.equipmentProcurement"
+                ><template #prepend>设备采购</template></el-input
+              >
             </el-col>
             <el-col :span="8">
-              <el-input v-model="form.mainContractAmount.other">
-                <template #prepend>其他</template>
-              </el-input>
+              <el-input
+v-model="form.mainContractAmount.other"
+                ><template #prepend>其他</template></el-input
+              >
             </el-col>
           </el-row>
         </el-form-item>
         <el-form-item label="预计总收入" prop="estimatedtotalRevenue">
           <el-row>
-            <el-input v-model="form.estimatedtotalRevenue.total">
-              <template #prepend>总额</template>
-            </el-input>
+            <el-input
+v-model="form.estimatedtotalRevenue.total"
+              ><template #prepend>总额</template></el-input
+            >
           </el-row>
           <el-row>
             <el-col :span="8">
@@ -166,17 +170,19 @@
               >
             </el-col>
             <el-col :span="8">
-              <el-input v-model="form.estimatedtotalRevenue.other">
-                <template #prepend>其他</template>
-              </el-input>
+              <el-input
+v-model="form.estimatedtotalRevenue.other"
+                ><template #prepend>其他</template></el-input
+              >
             </el-col>
           </el-row>
         </el-form-item>
         <el-form-item label="预计总成本" prop="estimatedTotalCost">
           <el-row>
-            <el-input v-model="form.estimatedTotalCost.total">
-              <template #prepend>总额</template>
-            </el-input>
+            <el-input
+v-model="form.estimatedTotalCost.total"
+              ><template #prepend>总额</template></el-input
+            >
           </el-row>
           <el-row>
             <el-col :span="8">
@@ -185,14 +191,16 @@
               >
             </el-col>
             <el-col :span="8">
-              <el-input v-model="form.estimatedTotalCost.equipmentProcurement">
-                <template #prepend>设备采购</template>
-              </el-input>
+              <el-input
+v-model="form.estimatedTotalCost.equipmentProcurement"
+                ><template #prepend>设备采购</template></el-input
+              >
             </el-col>
             <el-col :span="8">
-              <el-input v-model="form.estimatedTotalCost.other">
-                <template #prepend>其他</template>
-              </el-input>
+              <el-input
+v-model="form.estimatedTotalCost.other"
+                ><template #prepend>其他</template></el-input
+              >
             </el-col>
           </el-row>
         </el-form-item>
@@ -203,9 +211,10 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="addOrEdit(index, form)">
-            确认
-          </el-button>
+          <el-button
+type="primary" @click="addOrEdit(index, form)"
+            >确认</el-button
+          >
         </span>
       </template>
     </el-dialog>
