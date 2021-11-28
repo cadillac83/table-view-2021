@@ -18,7 +18,7 @@
                         </el-col>
                     </el-row>
                 </div>
-                <el-table :data="filteredContractLlist" height="calc(100vh - 135px)" stripe>
+                <el-table :data="filteredContractList" height="calc(100vh - 135px)" stripe>
                     <el-table-column prop="projectName" label="项目名称" fixed align="center" width="120" />
                     <el-table-column prop="projectShorterName" label="项目简称" align="center" width="120" />
                     <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
@@ -215,7 +215,7 @@ export default {
             },
 
             contractLlist: [],
-            filteredContractLlist: []
+            filteredContractList: []
         }
     },
     computed: {
@@ -226,7 +226,7 @@ export default {
     watch: {
         searchKeyWord(newVal) {
             // eslint-disable-next-line prettier/prettier
-            this.filteredContractLlist = this.contractLlist.filter(
+            this.filteredContractList = this.contractLlist.filter(
                 item => !newVal ||
                 item.projectName.toLowerCase().includes(newVal.toLowerCase()) ||
                 item.projectShorterName.toLowerCase().includes(newVal.toLowerCase()))
@@ -234,7 +234,7 @@ export default {
     },
     created() {
         this.contractLlist = contractLlist.page.list
-        this.filteredContractLlist = this.contractLlist
+        this.filteredContractList = this.contractLlist
     },
     methods: {
         handleClick() {},
