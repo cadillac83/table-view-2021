@@ -1,11 +1,11 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import Contract from "../views/Contract.vue";
+import Main from "../views/Main.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "Contract",
-    component: Contract,
+    name: "Main",
+    component: Main,
   }
 ];
 
