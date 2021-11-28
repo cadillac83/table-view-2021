@@ -1,11 +1,11 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import TableView from "../views/TableView.vue";
+import Contract from "../views/Contract.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "TableView",
-    component: TableView,
+    name: "Contract",
+    component: Contract,
   }
 ];
 

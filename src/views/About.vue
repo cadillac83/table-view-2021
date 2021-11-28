@@ -130,7 +130,7 @@ import mcaList from '../json/mcaList.json'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 export default {
-    name: 'TableView',
+    name: 'Contract',
     data() {
         return {
             height: window.innerHeight - 150,

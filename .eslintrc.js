@@ -23,8 +23,11 @@ module.exports = {
         singleQuote: true,
         semi: false,
         trailingComma: "none",
-        printWidth:1000,
-        tabWidth:4
+        printWidth:300,
+        tabWidth:4,
+        endOfLine: "auto",
+        arrowParens: "avoid",
+        eslintIntegration: false
       }
     ],
     'vue/max-attributes-per-line': [

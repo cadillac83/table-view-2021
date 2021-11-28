@@ -2,34 +2,48 @@
     <div class="main">
         <el-tabs v-model="activeName" @tab-click="handleClick" type="border-card">
             <el-tab-pane label="建造合同准则" name="first" class="tab-pane">
-                <div class="opration-line"><el-button type="success" @click="handleAdd()">新建</el-button></div>
-                <el-table :data="mcaList" height="calc(100vh - 135px)" stripe>
-                    <!-- <el-table-column prop="id" label="序号" fixed align="center" width="150" /> -->
-                    <el-table-column prop="name" label="项目名称" fixed align="center" width="120" />
-                    <el-table-column prop="referredName" label="项目简称" align="center" width="120" />
-                    <el-table-column prop="number" label="项目编号" align="center" />
+                <div class="opration-line">
+                    <el-row justify="space-between">
+                        <el-col :span="4">
+                            <el-row justify="start"><el-button type="success" @click="handleAdd()">新建</el-button></el-row>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-input v-model="searchKeyWord" placeholder="请输入项目名称搜索" clearable>
+                                <template #prepend>
+                                    <el-button>
+                                        <el-icon><search /></el-icon>
+                                    </el-button>
+                                </template>
+                            </el-input>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-table :data="filteredContractLlist" height="calc(100vh - 135px)" stripe>
+                    <el-table-column prop="projectName" label="项目名称" fixed align="center" width="120" />
+                    <el-table-column prop="projectShorterName" label="项目简称" align="center" width="120" />
+                    <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
                     <el-table-column label="主合同金额" align="center">
-                        <el-table-column prop="mainContractAmount.total" label="总额" align="center" width="120" />
+                        <el-table-column prop="contractAmountTotal" label="总额" sortable align="center" width="120" />
                         <el-table-column label="细分" align="center" width="120">
-                            <el-table-column prop="mainContractAmount.constructionSafety" label="建安" align="center" width="120" />
-                            <el-table-column prop="mainContractAmount.equipmentProcurement" label="设备采购" align="center" width="120" />
-                            <el-table-column prop="mainContractAmount.other" label="其他" align="center" width="120" />
+                            <el-table-column prop="contractAmountBuild" label="建安" align="center" width="120" />
+                            <el-table-column prop="contractAmountEquip" label="设备采购" align="center" width="120" />
+                            <el-table-column prop="contractAmountOther" label="其他" align="center" width="120" />
                         </el-table-column>
                     </el-table-column>
                     <el-table-column label="预计总收入" align="center">
-                        <el-table-column prop="estimatedtotalRevenue.total" label="总额" align="center" width="120" />
+                        <el-table-column prop="incomeAmountTotal" label="总额" align="center" width="120" />
                         <el-table-column label="细分" align="center" width="120">
-                            <el-table-column prop="estimatedtotalRevenue.constructionSafety" label="建安" align="center" width="120" />
-                            <el-table-column prop="estimatedtotalRevenue.equipmentProcurement" label="设备采购" align="center" width="120" />
-                            <el-table-column prop="estimatedtotalRevenue.other" label="其他" align="center" width="120" />
+                            <el-table-column prop="incomeAmountBuild" label="建安" align="center" width="120" />
+                            <el-table-column prop="incomeAmountEquip" label="设备采购" align="center" width="120" />
+                            <el-table-column prop="incomeAmountOther" label="其他" align="center" width="120" />
                         </el-table-column>
                     </el-table-column>
                     <el-table-column label="预计总成本" align="center">
-                        <el-table-column prop="estimatedTotalCost.total" label="总额" align="center" width="120" />
+                        <el-table-column prop="costAmountTotal" label="总额" align="center" width="120" />
                         <el-table-column label="细分" align="center" width="120">
-                            <el-table-column prop="estimatedTotalCost.constructionSafety" label="建安" align="center" width="120" />
-                            <el-table-column prop="estimatedTotalCost.equipmentProcurement" label="设备采购" align="center" width="120" />
-                            <el-table-column prop="estimatedTotalCost.other" label="其他" align="center" width="120" />
+                            <el-table-column prop="costAmountBuild" label="建安" align="center" width="120" />
+                            <el-table-column prop="costAmountEquip" label="设备采购" align="center" width="120" />
+                            <el-table-column prop="costAmountOther" label="其他" align="center" width="120" />
                         </el-table-column>
                     </el-table-column>
                     <el-table-column prop="profit" label="利润" align="center" width="120" />
@@ -46,74 +60,74 @@
             <el-tab-pane label="实际收付费记录表" name="fourth"> 实际收付费记录表 </el-tab-pane>
         </el-tabs>
 
-        <el-dialog v-model="editDialogVisible" :title="index === -1 ? '新建合同' : '编辑合同'" align="center" width="50%">
+        <el-dialog v-model="editDialogVisible" :title="index === -1 ? '新建合同' : '编辑合同'" width="50%">
             <el-form ref="form" :model="form" label-align="center" width="120px" :rules="rules">
-                <el-form-item label="项目编号" prop="number">
-                    <el-input v-model="form.number"></el-input>
+                <el-form-item label="项目编号" prop="projectNumber">
+                    <el-input v-model="form.projectNumber"></el-input>
                 </el-form-item>
-                <el-form-item label="项目名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                <el-form-item label="项目名称" prop="projectName">
+                    <el-input v-model="form.projectName"></el-input>
                 </el-form-item>
                 <el-form-item label="项目简称">
-                    <el-input v-model="form.referredName"></el-input>
+                    <el-input v-model="form.projectShorterName"></el-input>
                 </el-form-item>
-                <el-form-item label="主合同金额" prop="mainContractAmount">
+                <el-form-item label="主合同金额" prop="contractAmountTotal">
                     <el-row>
-                        <el-input v-model="form.mainContractAmount.total"> <template #prepend>总额</template></el-input>
+                        <el-input v-model="form.contractAmountTotal"> <template #prepend>总额</template></el-input>
                     </el-row>
                     <el-row>
                         <el-col :span="8">
-                            <el-input v-model="form.mainContractAmount.constructionSafety"> <template #prepend>建安</template></el-input>
+                            <el-input v-model="form.contractAmountBuild"> <template #prepend>建安</template></el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.mainContractAmount.equipmentProcurement">
+                            <el-input v-model="form.contractAmountEquip">
                                 <template #prepend>设备采购</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.mainContractAmount.other">
+                            <el-input v-model="form.contractAmountOther">
                                 <template #prepend>其他</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="预计总收入" prop="estimatedtotalRevenue">
+                <el-form-item label="预计总收入" prop="incomeAmountTotal">
                     <el-row>
-                        <el-input v-model="form.estimatedtotalRevenue.total">
+                        <el-input v-model="form.incomeAmountTotal">
                             <template #prepend>总额</template>
                         </el-input>
                     </el-row>
                     <el-row>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedtotalRevenue.constructionSafety"> <template #prepend>建安</template></el-input>
+                            <el-input v-model="form.incomeAmountBuild"> <template #prepend>建安</template></el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedtotalRevenue.equipmentProcurement"><template #prepend>设备采购</template></el-input>
+                            <el-input v-model="form.incomeAmountEquip"><template #prepend>设备采购</template></el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedtotalRevenue.other">
+                            <el-input v-model="form.incomeAmountOther">
                                 <template #prepend>其他</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="预计总成本" prop="estimatedTotalCost">
+                <el-form-item label="预计总成本" prop="costAmountTotal">
                     <el-row>
-                        <el-input v-model="form.estimatedTotalCost.total">
+                        <el-input v-model="form.costAmountTotal">
                             <template #prepend>总额</template>
                         </el-input>
                     </el-row>
                     <el-row>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedTotalCost.constructionSafety"> <template #prepend>建安</template></el-input>
+                            <el-input v-model="form.costAmountBuild"> <template #prepend>建安</template></el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedTotalCost.equipmentProcurement">
+                            <el-input v-model="form.costAmountEquip">
                                 <template #prepend>设备采购</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input v-model="form.estimatedTotalCost.other">
+                            <el-input v-model="form.costAmountOther">
                                 <template #prepend>其他</template>
                             </el-input>
                         </el-col>
@@ -126,7 +140,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="editDialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="addOrEdit(index, form)"> 确认 </el-button>
+                    <el-button type="primary" @click="addOrEdit(index, form)">确认</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -134,26 +148,40 @@
 </template>
 
 <script>
-import mcaList from '../json/mcaList.json'
+import contractLlist from '../json/contractLlist.json'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 export default {
-    name: 'TableView',
+    name: 'Contract',
     data() {
         return {
             height: window.innerHeight - 150,
             activeName: 'first',
             editDialogVisible: false,
             index: 0,
+            searchKeyWord: '',
             form: {},
             rules: {},
-            mcaList: []
+
+            contractLlist: [],
+            filteredContractLlist: []
+        }
+    },
+    computed: {},
+    watch: {
+        searchKeyWord(newVal) {
+            // eslint-disable-next-line prettier/prettier
+            this.filteredContractLlist = this.contractLlist.filter(
+                item => !newVal ||
+                item.projectName.toLowerCase().includes(newVal.toLowerCase()) ||
+                item.projectShorterName.toLowerCase().includes(newVal.toLowerCase()))
         }
     },
     created() {
-        this.mcaList = mcaList
+        this.contractLlist = contractLlist.page.list
+        this.filteredContractLlist = this.contractLlist
         this.rules = {
-            name: [
+            projectName: [
                 {
                     required: true,
                     message: '请填写项目名称',
@@ -173,28 +201,21 @@ export default {
         handleClick() {},
         handleAdd() {
             this.form = {
-                id: '',
-                name: '',
-                referredName: '',
-                number: '',
-                mainContractAmount: {
-                    total: 0,
-                    constructionSafety: 0,
-                    equipmentProcurement: 0,
-                    other: 0
-                },
-                estimatedtotalRevenue: {
-                    total: 0,
-                    constructionSafety: 0,
-                    equipmentProcurement: 0,
-                    other: 0
-                },
-                estimatedTotalCost: {
-                    total: 0,
-                    constructionSafety: 0,
-                    equipmentProcurement: 0,
-                    other: 0
-                },
+                projectName: '',
+                projectShorterName: '',
+                projectNumber: '',
+                contractAmountTotal: 0,
+                contractAmountBuild: 0,
+                contractAmountEquip: 0,
+                contractAmountOther: 0,
+                incomeAmountTotal: 0,
+                incomeAmountBuild: 0,
+                incomeAmountEquip: 0,
+                incomeAmountOther: 0,
+                costAmountTotal: 0,
+                costAmountBuild: 0,
+                costAmountEquip: 0,
+                costAmountOther: 0,
                 profile: 0
             }
             this.index = -1
@@ -202,9 +223,9 @@ export default {
         },
         addOrEdit(index, form) {
             if (index === -1) {
-                this.mcaList.push(form)
+                this.contractLlist.push(form)
             } else {
-                this.mcaList.splice(index, 1, form)
+                this.contractLlist.splice(index, 1, form)
             }
             this.editDialogVisible = false
         },
@@ -215,13 +236,13 @@ export default {
         },
         handleDelete(index, row) {
             this.index = index
-            ElMessageBox.confirm(`确认删除合同《 ${row.name}》,编号${row.number}?`, '提示', {
+            ElMessageBox.confirm(`确认删除合同《 ${row.projectName}》,编号${row.projectNumber}?`, '提示', {
                 confirmButtonText: '是',
                 cancelButtonText: '否',
                 type: 'warning'
             })
                 .then(() => {
-                    this.mcaList.splice(index, 1)
+                    this.contractLlist.splice(index, 1)
                     ElMessage({
                         type: 'success',
                         message: '删除成功'
