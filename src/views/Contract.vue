@@ -2,17 +2,23 @@
     <div>
         <div class="opration-line">
             <el-row justify="space-between">
-                <el-col :span="4">
-                    <el-row justify="start"><el-button type="success" @click="handleAdd()">新建</el-button></el-row>
-                </el-col>
                 <el-col :span="12">
-                    <el-input v-model="searchKeyWord" placeholder="请输入项目名称搜索" clearable>
-                        <template #prepend>
-                            <el-button>
-                                <el-icon><search /></el-icon>
-                            </el-button>
-                        </template>
-                    </el-input>
+                    <el-row justify="start">
+                        <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号搜索" clearable>
+                            <template #prepend>
+                                <el-button>
+                                    <el-icon><search /></el-icon>
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-row>
+                </el-col>
+                <el-col :span="4">
+                    <el-row justify="end">
+                        <div class="add-button">
+                            <el-button type="success" @click="handleAdd()">新建</el-button>
+                        </div>
+                    </el-row>
                 </el-col>
             </el-row>
         </div>
@@ -20,7 +26,7 @@
             <el-table-column prop="projectName" label="项目名称" fixed align="center" width="120" />
             <el-table-column prop="projectShorterName" label="项目简称" align="center" width="120" />
             <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
-            <el-table-column label="主合同金额" align="center">
+            <el-table-column label="主合同金额（单位：万元）" align="center">
                 <el-table-column prop="contractAmountTotal" label="总额" sortable align="center" width="120" />
                 <el-table-column label="细分" align="center" width="120">
                     <el-table-column prop="contractAmountBuild" label="建安" align="center" width="120" />
@@ -28,7 +34,7 @@
                     <el-table-column prop="contractAmountOther" label="其他" align="center" width="120" />
                 </el-table-column>
             </el-table-column>
-            <el-table-column label="预计总收入" align="center">
+            <el-table-column label="预计总收入（单位：万元）" align="center">
                 <el-table-column prop="incomeAmountTotal" label="总额" align="center" width="120" />
                 <el-table-column label="细分" align="center" width="120">
                     <el-table-column prop="incomeAmountBuild" label="建安" align="center" width="120" />
@@ -36,7 +42,7 @@
                     <el-table-column prop="incomeAmountOther" label="其他" align="center" width="120" />
                 </el-table-column>
             </el-table-column>
-            <el-table-column label="预计总成本" align="center">
+            <el-table-column label="预计总成本（单位：万元）" align="center">
                 <el-table-column prop="costAmountTotal" label="总额" align="center" width="120" />
                 <el-table-column label="细分" align="center" width="120">
                     <el-table-column prop="costAmountBuild" label="建安" align="center" width="120" />
@@ -45,10 +51,11 @@
                 </el-table-column>
             </el-table-column>
             <el-table-column prop="profit" label="利润" align="center" width="120" />
+            <el-table-column prop="incomeCostPercentage" label="收入成本占比" align="center" width="120" />
             <el-table-column label="操作" fixed="right" align="center" width="180">
                 <template #default="scope">
-                    <el-button round size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button round size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -128,6 +135,9 @@
             <el-form-item label="利润" prop="profit">
                 <el-input v-model="computedProfit" disabled></el-input>
             </el-form-item>
+            <el-form-item label="收入成本占比" prop="incomeCostPercentage">
+                <el-input v-model="computedIncomeCostPercentage" disabled></el-input>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -143,13 +153,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import contractList from '../json/contractList.json'
 
 export default {
-    name: 'Main',
-    props: {
-        value: {
-            type: String,
-            default: ''
-        }
-    },
+    name: 'Contract',
     data() {
         const validAmount = (rule, value, callback) => {
             if (value < 0) {
@@ -178,7 +182,8 @@ export default {
                 costAmountBuild: '',
                 costAmountEquip: '',
                 costAmountOther: '',
-                profit: 0
+                profit: 0,
+                incomeCostPercentage: 0
             },
             contractForm: {
                 incomeAmountTotal: 0,
@@ -218,15 +223,24 @@ export default {
     computed: {
         computedProfit() {
             return this.contractForm.incomeAmountTotal - this.contractForm.costAmountTotal
+        },
+        computedIncomeCostPercentage() {
+            if (this.contractForm.incomeAmountTotal > 0 && this.contractForm.costAmountTotal > 0) {
+                return this.contractForm.incomeAmountTotal / this.contractForm.costAmountTotal
+            } else {
+                return 0
+            }
         }
     },
     watch: {
         searchKeyWord(newVal) {
-            // eslint-disable-next-line prettier/prettier
-            this.filteredContractList = this.contractList.filter(
-                item => !newVal ||
-                item.projectName.toLowerCase().includes(newVal.toLowerCase()) ||
-                item.projectShorterName.toLowerCase().includes(newVal.toLowerCase()))
+            this.filteredContractList = this.contractList.filter(item => {
+                const a = !newVal
+                const b = item.projectName.toLowerCase().includes(newVal.toLowerCase())
+                const c = item.projectShorterName.toLowerCase().includes(newVal.toLowerCase())
+                const d = item.projectNumber.includes(newVal)
+                return a || b || c || d
+            })
         }
     },
     created() {
@@ -249,6 +263,7 @@ export default {
         },
         save() {
             this.contractForm.profit = this.computedProfit
+            this.contractForm.incomeCostPercentage = this.computedIncomeCostPercentage
             // TODO http
             if (this.operation === 'add') {
                 this.contractForm.projectNumber = 'add-new-test'
@@ -301,5 +316,8 @@ export default {
 <style scoped>
 .opration-line {
     margin-bottom: 5px;
+}
+.add-button {
+    padding-right: 25px;
 }
 </style>

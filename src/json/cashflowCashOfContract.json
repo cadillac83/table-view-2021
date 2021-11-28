@@ -1,0 +1,72 @@
+{
+    "msg": "success",
+    "code": 200,
+    "ContractCashView": {
+      "projectNumber": "202111270001",
+      "version": 1,
+      "projectName": "测试某某公司大型工程园区建造合同1",
+      "projectShorterName": "测试某司园区合同缩写1",
+      "contractAmountTotal": 2000000.0,
+      "contractAmountBuild": 1600000.0,
+      "contractAmountEquip": 240000.0,
+      "contractAmountOther": 160000.0,
+      "incomeAmountTotal": 1200000.0,
+      "incomeAmountBuild": 600000.0,
+      "incomeAmountEquip": 400000.0,
+      "incomeAmountOther": 200000.0,
+      "costAmountTotal": 800000.0,
+      "costAmountBuild": 400000.0,
+      "costAmountEquip": 300000.0,
+      "costAmountOther": 100000.0,
+      "profit": 400000.0,
+      "incomeCostPercentage": 1.5,
+      "createTime": "2021-11-28 10:11:38",
+      "cashFlowList": [
+        {
+          "stage": "2021年7月",
+          "income": 500000,
+          "cumulateIncome": 0,
+          "outcome": 90000,
+          "cumulateOutcome": 0,
+          "stageCashFlow": 0,
+          "cumulateCashFLow": 0
+        },
+        {
+          "stage": "2021年6月",
+          "income": 400000,
+          "cumulateIncome": 0,
+          "outcome": 80000,
+          "cumulateOutcome": 0,
+          "stageCashFlow": 0,
+          "cumulateCashFLow": 0
+        },
+        {
+          "stage": "2021年5月",
+          "income": 300000,
+          "cumulateIncome": 0,
+          "outcome": 70000,
+          "cumulateOutcome": 0,
+          "stageCashFlow": 0,
+          "cumulateCashFLow": 0
+        },
+        {
+          "stage": "2021年3月",
+          "income": 200000,
+          "cumulateIncome": 0,
+          "outcome": 60000,
+          "cumulateOutcome": 0,
+          "stageCashFlow": 0,
+          "cumulateCashFLow": 0
+        },
+        {
+          "stage": "2021年2月",
+          "income": 100000,
+          "cumulateIncome": 0,
+          "outcome": 50000,
+          "cumulateOutcome": 0,
+          "stageCashFlow": 0,
+          "cumulateCashFLow": 0
+        }
+      ]
+    }
+  }
