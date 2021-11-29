@@ -13,7 +13,7 @@
                         </el-input>
                     </el-row>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="12">
                     <el-row justify="end">
                         <div class="add-button">
                             <el-button type="success" @click="handleAdd()">新建</el-button>

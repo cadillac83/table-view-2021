@@ -15,11 +15,12 @@
                         </el-select>
                     </el-row>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="12">
                     <el-row justify="end">
                         <div class="add-button">
-                            <el-button :type="isModified ? 'primary' : 'info'" :disabled="!isModified" @click="handleUpdate()">更新</el-button>
-                            <el-button :type="this.targetProject ? 'success' : 'info'" :disabled="!this.targetProject" @click="handleAdd()">新建</el-button>
+                            <el-button :type="this.targetProject ? 'primary' : 'info'" :disabled="!this.targetProject" @click="isEditMode = !isEditMode">{{ isEditMode ? '切换到浏览模式' : '切换到编辑模式' }}</el-button>
+                            <el-button :type="this.targetProject ? 'success' : 'info'" :disabled="!this.targetProject" @click="handleAdd()">新增阶段</el-button>
+                            <el-button :type="isModified ? 'warning' : 'info'" :disabled="!isModified" @click="handleUpdate()">提交更新</el-button>
                         </div>
                     </el-row>
                 </el-col>
@@ -29,25 +30,58 @@
             <el-table-column prop="stage" label="阶段" sortable align="center" />
             <el-table-column prop="income" label="收费" align="center">
                 <template #default="scope">
-                    <el-input v-model.number="scope.row.income" @change="changeCashFlowList"></el-input>
+                    <div v-if="isEditMode">
+                        <el-input v-model.number="scope.row.income" @change="modifiedCashFlowList"></el-input>
+                    </div>
+                    <div v-else>{{ scope.row.income }}</div>
                 </template>
             </el-table-column>
             <el-table-column prop="outcome" label="付费" align="center">
                 <template #default="scope">
-                    <el-input v-model.number="scope.row.outcome" @change="changeCashFlowList"></el-input>
+                    <div v-if="isEditMode">
+                        <el-input v-model.number="scope.row.outcome" @change="modifiedCashFlowList"></el-input>
+                    </div>
+                    <div v-else>{{ scope.row.outcome }}</div>
                 </template>
             </el-table-column>
             <el-table-column prop="cumulateIncome" label="累计计划收费" align="center" />
             <el-table-column prop="cumulateOutcome" label="累计计划付费" align="center" />
             <el-table-column prop="stageCashFlow" label="当期现金流" align="center" />
             <el-table-column prop="cumulateCashFLow" label="累计现金流" align="center" />
-            <el-table-column label="操作" fixed="right" align="center" width="180">
+            <el-table-column label="操作" fixed="right" align="center">
                 <template #default="scope">
                     <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
     </div>
+
+    <el-dialog v-if="dialogVisible" v-model="dialogVisible" title="新建现金流" width="60%">
+        <el-form ref="cashFlowForm" :model="cashFlowForm" label-width="120px" :label-position="'right'" :rules="rules">
+            <el-form-item label="项目名称">
+                {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectName }}
+            </el-form-item>
+            <el-form-item label="项目编号">
+                {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectNumber }}
+            </el-form-item>
+            <el-form-item label="阶段" prop="stage">
+                <el-date-picker v-model="cashFlowForm.stage" type="month" placeholder="选择月份" format="YYYY年MM月"> </el-date-picker>
+                {{ !cashFlowForm.stage || `${cashFlowForm.stage.getFullYear()}年${cashFlowForm.stage.getMonth() + 1}月` }}
+            </el-form-item>
+            <el-form-item label="收费" prop="income">
+                <el-input v-model.number="cashFlowForm.income"></el-input>
+            </el-form-item>
+            <el-form-item label="付费" prop="outcome">
+                <el-input v-model.number="cashFlowForm.outcome"></el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="cancel()">取消</el-button>
+                <el-button type="primary" @click="addToCashFlowList()">添加到现金流表</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -57,11 +91,39 @@ import cashflowCashOfContract from '../json/cashflowCashOfContract.json'
 export default {
     name: 'CashFlow',
     data() {
+        const validAmount = (rule, value, callback) => {
+            if (value < 0) {
+                callback(new Error('金额不能小于零！'))
+            }
+            callback()
+        }
         return {
             targetProject: '',
             contractNameList: [],
             cashFlowList: [],
-            isModified: false
+            isEditMode: false,
+            isModified: false,
+            dialogVisible: false,
+            cashFlowForm: {},
+            initCashFlowForm: {
+                stage: '',
+                income: '',
+                outcome: ''
+            },
+            rules: {
+                stage: [{ required: true, message: '请选择月份', trigger: 'blur' }],
+
+                income: [
+                    { required: true, message: '请填写金额', trigger: 'blur' },
+                    { type: 'number', message: '金额必须为数字' },
+                    { validator: validAmount, trigger: 'blur' }
+                ],
+                outcome: [
+                    { required: true, message: '请填写金额', trigger: 'blur' },
+                    { type: 'number', message: '金额必须为数字' },
+                    { validator: validAmount, trigger: 'blur' }
+                ]
+            }
         }
     },
     computed: {
@@ -91,7 +153,7 @@ export default {
     watch: {
         targetProject(val) {
             // TODO http
-            this.cashFlowList = cashflowCashOfContract.ContractCashView.cashFlowList.slice().reverse() // 默认是时间降序排序
+            this.cashFlowList = cashflowCashOfContract.data.cashFlowList.slice().reverse() // 默认是时间降序排序
         }
     },
     created() {
@@ -114,10 +176,15 @@ export default {
             this.filteredContractNameList = this.contractNameList
         },
         handleAdd() {
-            console.log('handleAdd')
+            this.cashFlowForm = Object.create(this.initCashFlowForm)
+            this.dialogVisible = true
         },
         handleUpdate() {
-            console.log('handleUpdate')
+            ElMessage({
+                type: 'success',
+                message: '提交成功'
+            })
+            this.isModified = false
         },
         handleDelete(index, row) {
             this.index = index
@@ -142,9 +209,23 @@ export default {
                     })
                 })
         },
-        changeCashFlowList(val) {
-            console.log('changeCashFlowList', val)
+        modifiedCashFlowList(val) {
             this.isModified = true
+        },
+        cancel() {
+            this.dialogVisible = false
+        },
+        addToCashFlowList() {
+            this.$refs.cashFlowForm.validate(valid => {
+                if (valid) {
+                    this.cashFlowForm.stage = `${this.cashFlowForm.stage.getFullYear()}年${this.cashFlowForm.stage.getMonth() + 1}月`
+                    this.cashFlowList.push(this.cashFlowForm)
+                    this.isModified = true
+                    this.dialogVisible = false
+                } else {
+                    return false
+                }
+            })
         }
     }
 }
