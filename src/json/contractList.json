@@ -1,7 +1,7 @@
 {
     "msg": "success",
     "code": 200,
-    "page": {
+    "data": {
         "totalCount": 0,
         "pageSize": 5,
         "totalPage": 0,

@@ -1,7 +1,7 @@
 {
     "msg": "success",
     "code": 200,
-    "ContractCashView": {
+    "data": {
       "projectNumber": "202111270001",
       "version": 1,
       "projectName": "测试某某公司大型工程园区建造合同1",
