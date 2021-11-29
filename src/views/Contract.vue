@@ -7,7 +7,7 @@
                         <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号搜索" clearable>
                             <template #prepend>
                                 <el-button>
-                                    <el-icon><search /></el-icon>
+                                    <el-icon><i-search /></el-icon>
                                 </el-button>
                             </template>
                         </el-input>
@@ -150,7 +150,7 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import contractList from '../json/contractList.json'
+import { getContractList } from '@/api/contract'
 
 export default {
     name: 'Contract',
@@ -243,8 +243,9 @@ export default {
             })
         }
     },
-    created() {
-        this.contractList = contractList.data.list
+    async created() {
+        const { data } = await getContractList() // axios
+        this.contractList = data.data.list
         this.filteredContractList = this.contractList
     },
     methods: {

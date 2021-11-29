@@ -10,7 +10,7 @@
                                 <span class="el-option-right">{{ item.projectNumber }}</span>
                             </el-option>
                             <template #prefix>
-                                <el-icon size="16px"><list /></el-icon>
+                                <el-icon size="16px"><i-list /></el-icon>
                             </template>
                         </el-select>
                     </el-row>
@@ -56,17 +56,22 @@
         </el-table>
     </div>
 
-    <el-dialog v-if="dialogVisible" v-model="dialogVisible" title="新建现金流" width="60%">
+    <el-dialog v-if="dialogVisible" v-model="dialogVisible" title="新建现金流" width="40%">
         <el-form ref="cashFlowForm" :model="cashFlowForm" label-width="120px" :label-position="'right'" :rules="rules">
             <el-form-item label="项目名称">
-                {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectName }}
+                <el-row justify="start">
+                    {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectName }}
+                </el-row>
             </el-form-item>
             <el-form-item label="项目编号">
-                {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectNumber }}
+                <el-row justify="start">
+                    {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectNumber }}
+                </el-row>
             </el-form-item>
             <el-form-item label="阶段" prop="stage">
-                <el-date-picker v-model="cashFlowForm.stage" type="month" placeholder="选择月份" format="YYYY年MM月"> </el-date-picker>
-                {{ !cashFlowForm.stage || `${cashFlowForm.stage.getFullYear()}年${cashFlowForm.stage.getMonth() + 1}月` }}
+                <el-row justify="start">
+                    <el-date-picker style="width: 100%" v-model="cashFlowForm.stage" type="month" placeholder="选择月份" format="YYYY年MM月"> </el-date-picker>
+                </el-row>
             </el-form-item>
             <el-form-item label="收费" prop="income">
                 <el-input v-model.number="cashFlowForm.income"></el-input>
@@ -85,8 +90,8 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import contractNameList from '../json/contractListProjectName.json'
-import cashflowCashOfContract from '../json/cashflowCashOfContract.json'
+import { getContractNameList } from '@/api/contract'
+import { getCashOfContractList } from '@/api/cashFlow'
 
 export default {
     name: 'CashFlow',
@@ -97,9 +102,18 @@ export default {
             }
             callback()
         }
+        const validStage = (rule, value, callback) => {
+            const stage = `${value.getFullYear()}年${('0' + (value.getMonth() + 1)).slice(-2)}月`
+            if (this.cashFlowList.find(item => item.stage === stage)) {
+                callback(new Error('月份已存在，请重新选择！'))
+            }
+            callback()
+        }
+
         return {
             targetProject: '',
             contractNameList: [],
+            filteredContractNameList: [],
             cashFlowList: [],
             isEditMode: false,
             isModified: false,
@@ -111,7 +125,10 @@ export default {
                 outcome: ''
             },
             rules: {
-                stage: [{ required: true, message: '请选择月份', trigger: 'blur' }],
+                stage: [
+                    { required: true, message: '请选择月份', trigger: 'blur' },
+                    { validator: validStage, trigger: 'blur' }
+                ],
 
                 income: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
@@ -151,13 +168,14 @@ export default {
         }
     },
     watch: {
-        targetProject(val) {
-            // TODO http
-            this.cashFlowList = cashflowCashOfContract.data.cashFlowList.slice().reverse() // 默认是时间降序排序
+        async targetProject(val) {
+            const { data } = await getCashOfContractList()
+            this.cashFlowList = data.data.cashFlowList.slice().reverse() // 默认是时间降序排序
         }
     },
-    created() {
-        this.contractNameList = contractNameList.data // TODO http
+    async created() {
+        const { data } = await getContractNameList()
+        this.contractNameList = data.data
         this.filteredContractNameList = this.contractNameList
     },
     methods: {
@@ -185,6 +203,7 @@ export default {
                 message: '提交成功'
             })
             this.isModified = false
+            this.isEditMode = false
         },
         handleDelete(index, row) {
             this.index = index
@@ -218,8 +237,9 @@ export default {
         addToCashFlowList() {
             this.$refs.cashFlowForm.validate(valid => {
                 if (valid) {
-                    this.cashFlowForm.stage = `${this.cashFlowForm.stage.getFullYear()}年${this.cashFlowForm.stage.getMonth() + 1}月`
+                    this.cashFlowForm.stage = `${this.cashFlowForm.stage.getFullYear()}年${('0' + (this.cashFlowForm.stage.getMonth() + 1)).slice(-2)}月`
                     this.cashFlowList.push(this.cashFlowForm)
+                    this.cashFlowList = this.cashFlowList.sort((a, b) => (a.stage > b.stage ? 1 : -1))
                     this.isModified = true
                     this.dialogVisible = false
                 } else {
@@ -230,7 +250,7 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .opration-line {
     margin-bottom: 5px;
 }

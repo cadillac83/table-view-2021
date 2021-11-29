@@ -1,8 +1,11 @@
-// import { Search,Expand } from '@element-plus/icons'
+import * as ElIconModules from '@element-plus/icons'
+import { transElIconName } from '@/util/utils'
 
-// const registeIcons = (app:any) => {
-// app.component('Search',Search)
-//     .component('Expand',Expand)
-// }
+const registeIcons = (app:any) => {
+    // 注册el-icon图标
+    for(let iconName in ElIconModules){
+        app.component(transElIconName(iconName),ElIconModules[iconName])
+    }
+}
 
-// export default registeIcons;
+export default registeIcons

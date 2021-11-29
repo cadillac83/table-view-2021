@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors":true, // https://blog.csdn.net/qq_31068787/article/details/121123216
     "sourceMap": true,
     "baseUrl": ".",
     "types": [

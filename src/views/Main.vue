@@ -26,7 +26,7 @@ export default {
     components: { Contract, CashFlow },
     data() {
         return {
-            activeName: 'second'
+            activeName: 'first'
         }
     }
 }

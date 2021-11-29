@@ -23,7 +23,7 @@
       "createTime": "2021-11-28 10:11:38",
       "cashFlowList": [
         {
-          "stage": "2021年7月",
+          "stage": "2021年07月",
           "income": 500000,
           "cumulateIncome": 0,
           "outcome": 90000,
@@ -32,7 +32,7 @@
           "cumulateCashFLow": 0
         },
         {
-          "stage": "2021年6月",
+          "stage": "2021年06月",
           "income": 400000,
           "cumulateIncome": 0,
           "outcome": 80000,
@@ -41,7 +41,7 @@
           "cumulateCashFLow": 0
         },
         {
-          "stage": "2021年5月",
+          "stage": "2021年05月",
           "income": 300000,
           "cumulateIncome": 0,
           "outcome": 70000,
@@ -50,7 +50,7 @@
           "cumulateCashFLow": 0
         },
         {
-          "stage": "2021年3月",
+          "stage": "2021年03月",
           "income": 200000,
           "cumulateIncome": 0,
           "outcome": 60000,
@@ -59,7 +59,7 @@
           "cumulateCashFLow": 0
         },
         {
-          "stage": "2021年2月",
+          "stage": "2021年02月",
           "income": 100000,
           "cumulateIncome": 0,
           "outcome": 50000,
