@@ -244,7 +244,7 @@ export default {
         }
     },
     created() {
-        this.contractList = contractList.page.list
+        this.contractList = contractList.data.list
         this.filteredContractList = this.contractList
     },
     methods: {
