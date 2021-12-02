@@ -7,11 +7,11 @@
             <el-tab-pane label="现金流表" name="second">
                 <CashFlow />
             </el-tab-pane>
-            <el-tab-pane label="输出总表" name="third">
-                <div>输出总表</div>
+            <el-tab-pane label="实际收付费记录表" name="third">
+                <ActualAcceptPayment />
             </el-tab-pane>
-            <el-tab-pane label="实际收付费记录表" name="fourth">
-                <div>实际收付费记录表</div>
+            <el-tab-pane label="输出总表" name="fourth">
+                <OutputTotal />
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -20,13 +20,15 @@
 <script>
 import Contract from './Contract.vue'
 import CashFlow from './CashFlow.vue'
+import OutputTotal from './OutputTotal.vue'
+import ActualAcceptPayment from './ActualAcceptPayment.vue'
 
 export default {
     name: 'Main',
-    components: { Contract, CashFlow },
+    components: { Contract, CashFlow, OutputTotal, ActualAcceptPayment },
     data() {
         return {
-            activeName: 'first'
+            activeName: 'third'
         }
     }
 }

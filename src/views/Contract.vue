@@ -150,7 +150,7 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { getContractList } from '@/api/contract'
+import { httpGetContractList, httpPostContract } from '@/api/contract'
 
 export default {
     name: 'Contract',
@@ -243,15 +243,24 @@ export default {
             })
         }
     },
-    async created() {
-        const { data } = await getContractList() // axios
-        this.contractList = data.data.list
-        this.filteredContractList = this.contractList
+    created() {
+        this.getData()
     },
     methods: {
+        async getData() {
+            try {
+                const { data } = await httpGetContractList()
+                if (data && data.code === 200) {
+                    this.contractList = data.data.list
+                    this.filteredContractList = this.contractList
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
         handleClick() {},
         handleAdd() {
-            this.contractForm = Object.create(this.initContractForm)
+            this.contractForm = JSON.parse(JSON.stringify(this.initContractForm))
             this.index = -1
             this.operation = 'add'
             this.dialogVisible = true
@@ -261,17 +270,6 @@ export default {
             this.index = index
             this.operation = 'update'
             this.dialogVisible = true
-        },
-        save() {
-            this.contractForm.profit = this.computedProfit
-            this.contractForm.incomeCostPercentage = this.computedIncomeCostPercentage
-            // TODO http
-            if (this.operation === 'add') {
-                this.contractForm.projectNumber = 'add-new-test'
-                this.contractList.push(this.contractForm)
-            } else if (this.operation === 'update') {
-                this.contractList.splice(this.index, 1, this.contractForm)
-            }
         },
         handleDelete(index, row) {
             this.index = index
@@ -295,6 +293,28 @@ export default {
                     })
                 })
         },
+        async save() {
+            this.contractForm.profit = this.computedProfit
+            this.contractForm.incomeCostPercentage = this.computedIncomeCostPercentage
+            try {
+                const { data } = await httpPostContract(this.contractForm)
+                if (data || data.code === 200) {
+                    ElMessage({ type: 'success', message: '提交成功！' })
+                    // TODO 临时逻辑
+                    if (this.operation === 'add') {
+                        this.contractForm.projectNumber = 'test000001'
+                        this.contractList.push(this.contractForm)
+                    } else if (this.operation === 'update') {
+                        this.contractList.splice(this.index, 1, this.contractForm)
+                    }
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+                this.dialogVisible = false
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
         cancel() {
             this.dialogVisible = false
         },
@@ -305,7 +325,6 @@ export default {
             this.$refs.contractForm.validate(valid => {
                 if (valid) {
                     this.save()
-                    this.dialogVisible = false
                 } else {
                     return false
                 }

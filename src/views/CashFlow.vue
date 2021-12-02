@@ -4,7 +4,7 @@
             <el-row justify="space-between">
                 <el-col :span="12">
                     <el-row justify="start">
-                        <el-select v-model="targetProject" filterable :filter-method="filterContractNameList" @focus="resetList()" @blur="resetList()" placeholder="请选择要查看的项目">
+                        <el-select v-model="targetProjectNumber" filterable :filter-method="filterContractNameList" @focus="resetList()" @blur="resetList()" placeholder="请选择要查看的项目">
                             <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
                                 <span class="el-option-left">{{ item.projectName }}</span>
                                 <span class="el-option-right">{{ item.projectNumber }}</span>
@@ -18,8 +18,8 @@
                 <el-col :span="12">
                     <el-row justify="end">
                         <div class="add-button">
-                            <el-button :type="this.targetProject ? 'primary' : 'info'" :disabled="!this.targetProject" @click="isEditMode = !isEditMode">{{ isEditMode ? '切换到浏览模式' : '切换到编辑模式' }}</el-button>
-                            <el-button :type="this.targetProject ? 'success' : 'info'" :disabled="!this.targetProject" @click="handleAdd()">新增阶段</el-button>
+                            <el-button :type="this.targetProjectNumber ? 'primary' : 'info'" :disabled="!this.targetProjectNumber" @click="isEditMode = !isEditMode">{{ isEditMode ? '切换到浏览模式' : '切换到编辑模式' }}</el-button>
+                            <el-button :type="this.targetProjectNumber ? 'success' : 'info'" :disabled="!this.targetProjectNumber" @click="handleAdd()">新增现金流</el-button>
                             <el-button :type="isModified ? 'warning' : 'info'" :disabled="!isModified" @click="handleUpdate()">提交更新</el-button>
                         </div>
                     </el-row>
@@ -27,7 +27,11 @@
             </el-row>
         </div>
         <el-table :data="computedCashFlowList" height="calc(100vh - 135px)" stripe>
-            <el-table-column prop="stage" label="阶段" sortable align="center" />
+            <el-table-column prop="stage" label="阶段1" sortable align="center">
+                <template #default="scope">
+                    <div>{{ getDisplayDateFormat(scope.row.stage) }}</div>
+                </template>
+            </el-table-column>
             <el-table-column prop="income" label="收费" align="center">
                 <template #default="scope">
                     <div v-if="isEditMode">
@@ -60,12 +64,12 @@
         <el-form ref="cashFlowForm" :model="cashFlowForm" label-width="120px" :label-position="'right'" :rules="rules">
             <el-form-item label="项目名称">
                 <el-row justify="start">
-                    {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectName }}
+                    {{ filteredContractNameList.find(item => item.projectNumber === targetProjectNumber).projectName }}
                 </el-row>
             </el-form-item>
             <el-form-item label="项目编号">
                 <el-row justify="start">
-                    {{ filteredContractNameList.find(item => item.projectNumber === targetProject).projectNumber }}
+                    {{ filteredContractNameList.find(item => item.projectNumber === targetProjectNumber).projectNumber }}
                 </el-row>
             </el-form-item>
             <el-form-item label="阶段" prop="stage">
@@ -90,8 +94,8 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { getContractNameList } from '@/api/contract'
-import { getCashOfContractList } from '@/api/cashFlow'
+import { httpGetContractNameList } from '@/api/contract'
+import { httpGetCashOfContractList, httpPostCashflow } from '@/api/cashFlow'
 
 export default {
     name: 'CashFlow',
@@ -103,7 +107,7 @@ export default {
             callback()
         }
         const validStage = (rule, value, callback) => {
-            const stage = `${value.getFullYear()}年${('0' + (value.getMonth() + 1)).slice(-2)}月`
+            const stage = this.transformDateFormat(value)
             if (this.cashFlowList.find(item => item.stage === stage)) {
                 callback(new Error('月份已存在，请重新选择！'))
             }
@@ -111,7 +115,7 @@ export default {
         }
 
         return {
-            targetProject: '',
+            targetProjectNumber: '',
             contractNameList: [],
             filteredContractNameList: [],
             cashFlowList: [],
@@ -168,17 +172,32 @@ export default {
         }
     },
     watch: {
-        async targetProject(val) {
-            const { data } = await getCashOfContractList()
-            this.cashFlowList = data.data.cashFlowList.slice().reverse() // 默认是时间降序排序
+        async targetProjectNumber(newVal) {
+            try {
+                const { data } = await httpGetCashOfContractList(newVal)
+                if (data || data.code === 200) {
+                    this.cashFlowList = data.data.cashFlowList.sort((a, b) => (a.stage > b.stage ? 1 : -1))
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
         }
     },
     async created() {
-        const { data } = await getContractNameList()
-        this.contractNameList = data.data
-        this.filteredContractNameList = this.contractNameList
+        this.getData()
     },
     methods: {
+        async getData() {
+            try {
+                const { data } = await httpGetContractNameList()
+                this.contractNameList = data.data
+                this.filteredContractNameList = this.contractNameList
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
         filterContractNameList(val) {
             if (val) {
                 this.filteredContractNameList = this.contractNameList.filter(item => {
@@ -197,11 +216,17 @@ export default {
             this.cashFlowForm = Object.create(this.initCashFlowForm)
             this.dialogVisible = true
         },
-        handleUpdate() {
-            ElMessage({
-                type: 'success',
-                message: '提交成功'
-            })
+        async handleUpdate() {
+            try {
+                const { data } = await httpPostCashflow(this.cashFlowList)
+                if (data || data.code === 200) {
+                    ElMessage({ type: 'success', message: '提交成功！' })
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
             this.isModified = false
             this.isEditMode = false
         },
@@ -237,7 +262,7 @@ export default {
         addToCashFlowList() {
             this.$refs.cashFlowForm.validate(valid => {
                 if (valid) {
-                    this.cashFlowForm.stage = `${this.cashFlowForm.stage.getFullYear()}年${('0' + (this.cashFlowForm.stage.getMonth() + 1)).slice(-2)}月`
+                    this.cashFlowForm.stage = this.transformDateFormat(this.cashFlowForm.stage)
                     this.cashFlowList.push(this.cashFlowForm)
                     this.cashFlowList = this.cashFlowList.sort((a, b) => (a.stage > b.stage ? 1 : -1))
                     this.isModified = true
@@ -246,6 +271,12 @@ export default {
                     return false
                 }
             })
+        },
+        transformDateFormat(date) {
+            return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}`
+        },
+        getDisplayDateFormat(stage) {
+            return `${stage.slice(0, 4)}年${stage.slice(5, 7)}月`
         }
     }
 }

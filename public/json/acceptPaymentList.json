@@ -1,0 +1,32 @@
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 0,
+        "pageSize": 5,
+        "totalPage": 0,
+        "currPage": 1,
+        "list": [
+            {
+                "projectName": "测试某某公司大型工程园区建造合同1",
+                "projectNumber": "202111270001",
+                "contractAmountTotal": 2000000.0,
+                "incomeAmountTotal": 1200000.0,
+                "stage": "2021-07",
+                "accumulatedRevenue": 666,
+                "currentTwoAmount": 666,
+                "unfinishedConstructionFee": 666,
+                "accountsReceivable": 666,
+                "accumulatedActualCharges": 666,
+                "currentCharge": 666,
+                "accumulatedActualPayment": 666,
+                "currentPayment": 666,
+                "profitDeviation": 666,
+                "settlementRevenueProportion": 666,
+                "actualChargeProportion": 666,
+                "actualPaymentProportion": 666
+            }
+        ]
+    }
+}
+
