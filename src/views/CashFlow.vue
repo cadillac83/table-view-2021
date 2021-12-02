@@ -27,7 +27,7 @@
             </el-row>
         </div>
         <el-table :data="computedCashFlowList" height="calc(100vh - 135px)" stripe>
-            <el-table-column prop="stage" label="阶段1" sortable align="center">
+            <el-table-column prop="stage" label="当期年月" sortable align="center">
                 <template #default="scope">
                     <div>{{ getDisplayDateFormat(scope.row.stage) }}</div>
                 </template>
@@ -72,7 +72,7 @@
                     {{ filteredContractNameList.find(item => item.projectNumber === targetProjectNumber).projectNumber }}
                 </el-row>
             </el-form-item>
-            <el-form-item label="阶段" prop="stage">
+            <el-form-item label="当期年月" prop="stage">
                 <el-row justify="start">
                     <el-date-picker style="width: 100%" v-model="cashFlowForm.stage" type="month" placeholder="选择月份" format="YYYY年MM月"> </el-date-picker>
                 </el-row>

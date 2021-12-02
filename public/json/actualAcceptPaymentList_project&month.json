@@ -1,0 +1,32 @@
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 0,
+        "pageSize": 5,
+        "totalPage": 0,
+        "currPage": 1,
+        "list": [
+            {
+                "projectName": "特定project特定month",
+                "projectNumber": "202111270001",
+                "contractAmountTotal": 2000000.0,
+                "incomeAmountTotal": 1200000.0,
+                "stage": "2021-03",
+                "accumulatedRevenue": 12666,
+                "currentTwoAmount": 12666,
+                "unfinishedConstructionFee": 12666,
+                "accountsReceivable": 12666,
+                "accumulatedActualCharges": 12666,
+                "currentCharge": 12666,
+                "accumulatedActualPayment": 12666,
+                "currentPayment": 12666,
+                "profitDeviation": 12666,
+                "settlementRevenueProportion": 12666,
+                "actualChargeProportion": 12666,
+                "actualPaymentProportion": 12666
+            }
+        ]
+    }
+}
+
