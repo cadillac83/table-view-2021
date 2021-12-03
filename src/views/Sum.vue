@@ -5,7 +5,13 @@
                 <el-col :span="16">
                     <el-row justify="start">
                         <el-col :span="12">
-                            <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号" clearable> </el-input>
+                            <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号" clearable>
+                                <template #prepend>
+                                    <el-button>
+                                        <el-icon><i-search /></el-icon>
+                                    </el-button>
+                                </template>
+                            </el-input>
                         </el-col>
                         <el-date-picker v-model="searchDate" type="month" placeholder="请选择年月" format="YYYY年MM月"> </el-date-picker>
                         <el-button type="success" @click="handleSearch()">查询</el-button>
