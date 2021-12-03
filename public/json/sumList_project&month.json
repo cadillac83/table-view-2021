@@ -1,0 +1,33 @@
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 0,
+        "pageSize": 5,
+        "totalPage": 0,
+        "currPage": 1,
+        "list": [
+            {
+                "projectNumber": "222111testNumber",
+                "stage": "2021-02",
+                "agency": "湖北工程",
+                "paymentBeforeRemittance": 111.0,
+                "paymentAfterRemittance": 1000.0,
+                "unplannedCharges": 30000.0,
+                "unplannedPayment": 500.87,
+                "currentPlannedPayment": 2000.0,
+                "projectImageProgress": 111.0,
+                "projectName": "测试用月份和名称搜索",
+                "accumulatedActualCharges": 10000.0,
+                "accumulatedActualPayment": 6000.0,
+                "settlementRevenueProportion": 22.36,
+                "actualChargeProportion": 111.0,
+                "profitDeviation": 111.0,
+                "cumulateIncome": 30000.0,
+                "currentTwoAmount": 300000.0,
+                "balanceOfCurrentTwoAmount": 252500.88,
+                "currentPlannedCharge": 20000.0
+            }
+        ]
+    }
+}

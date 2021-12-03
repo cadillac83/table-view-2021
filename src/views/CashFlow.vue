@@ -194,6 +194,9 @@ export default {
                 const { data } = await httpGetContractNameList()
                 this.contractNameList = data.data
                 this.filteredContractNameList = this.contractNameList
+                if (this.filteredContractNameList.length > 0) {
+                    this.targetProjectNumber = this.filteredContractNameList[0].projectNumber
+                }
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
             }

@@ -4,3 +4,21 @@
 export const transElIconName = (iconName:string) => {
     return 'i' + iconName.replace(/[A-Z]/g, match => '-' + match.toLowerCase())
   }
+
+export const copyObjWhenKeyEqual = (copyFrom: Object, copyTo: Object): Object => {
+  const keysTo = Object.keys(copyTo);
+  for (const key of keysTo) {
+      if (copyFrom[key] !== undefined) {
+          copyTo[key] = copyFrom[key];
+      }
+  }
+  return copyTo;
+}
+
+export const transformDateFormat = (date:Date) => {
+  return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}`
+}
+
+export const getDisplayDateFormat = (stage:String) => {
+  return `${stage.slice(0, 4)}年${stage.slice(5, 7)}月`
+}

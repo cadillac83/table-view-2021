@@ -11,7 +11,7 @@
                 <ActualAcceptPayment />
             </el-tab-pane>
             <el-tab-pane label="输出总表" name="fourth">
-                <OutputTotal />
+                <Sum />
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -20,15 +20,15 @@
 <script>
 import Contract from './Contract.vue'
 import CashFlow from './CashFlow.vue'
-import OutputTotal from './OutputTotal.vue'
+import Sum from './Sum.vue'
 import ActualAcceptPayment from './ActualAcceptPayment.vue'
 
 export default {
     name: 'Main',
-    components: { Contract, CashFlow, OutputTotal, ActualAcceptPayment },
+    components: { Contract, CashFlow, Sum, ActualAcceptPayment },
     data() {
         return {
-            activeName: 'third'
+            activeName: 'first'
         }
     }
 }

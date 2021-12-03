@@ -3,7 +3,6 @@ import { AxiosPromise } from 'axios'
 
 export const httpGetActAccPmtList = (data:any) :AxiosPromise => {
     // return get('/history/detail','')
-    console.log('data',typeof data,data)
     if(data) {
         return get('/api/actualAcceptPaymentList_project&month.json','') //mock
     }else{

@@ -23,7 +23,7 @@
             </el-row>
         </div>
         <el-table :data="filteredContractList" height="calc(100vh - 135px)" stripe>
-            <el-table-column prop="projectName" label="项目名称" fixed align="center" width="120" />
+            <el-table-column prop="projectName" label="项目名称" fixed align="center" width="140" />
             <el-table-column prop="projectShorterName" label="项目简称" align="center" width="120" />
             <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
             <el-table-column label="主合同金额（单位：万元）" align="center">

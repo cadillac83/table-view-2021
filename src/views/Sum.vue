@@ -13,17 +13,15 @@
                 </el-col>
             </el-row>
         </div>
-        <el-table :data="filteredActAccPmtList" height="calc(100vh - 135px)" stripe>
+        <el-table :data="filteredSumList" height="calc(100vh - 135px)" stripe>
             <el-table-column prop="projectName" label="项目名称" fixed align="center" width="140" />
             <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
-            <el-table-column prop="contractAmountTotal" label="主合同总金额" sortable align="center" width="130" />
-            <el-table-column prop="incomeAmountTotal" label="预计总收入" align="center" width="120" />
             <el-table-column prop="stage" label="当期年月" align="center" width="120">
                 <template #default="scope">
                     <div>{{ getDisplayDateFormat(scope.row.stage) }}</div>
                 </template>
             </el-table-column>
-            <el-table-column v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :prop="itemName" :label="itemLabel" align="center" width="120" />
+            <el-table-column v-for="(itemName, itemLabel) in itemMap.dispalyNumItems" :key="itemName" :prop="itemName" :label="itemLabel" align="center" width="120" />
             <el-table-column label="操作" fixed="right" align="center" width="120">
                 <template #default="scope">
                     <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -33,14 +31,17 @@
         </el-table>
     </div>
 
-    <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建实际收付费记录' : '编辑实际收付费记录'" width="40%">
-        <el-form ref="actAccPmtForm" :model="actAccPmtForm" label-width="120px" :label-position="'right'">
+    <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建总表' : '编辑总表'" width="40%">
+        <el-form ref="sumForm" :model="sumForm" label-width="120px" :label-position="'right'">
             <el-form-item v-for="(itemName, itemLabel) in itemMap.displayItems" :key="itemName" :label="itemLabel" :prop="itemName">
-                <el-input v-if="itemName === 'stage'" :modelValue="getDisplayDateFormat(actAccPmtForm[itemName])" disabled></el-input>
-                <el-input v-else v-model="actAccPmtForm[itemName]" disabled></el-input>
+                <el-input v-if="itemName === 'stage'" :modelValue="getDisplayDateFormat(sumForm[itemName])" disabled></el-input>
+                <el-input v-else v-model="sumForm[itemName]" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="实施机构" prop="agency" :rules="rules.required">
+                <el-input v-model="sumForm['agency']"></el-input>
             </el-form-item>
             <el-form-item v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :label="itemLabel" :prop="itemName" :rules="rules.amountRequired">
-                <el-input v-model.number="actAccPmtForm[itemName]"></el-input>
+                <el-input v-model.number="sumForm[itemName]"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -54,11 +55,11 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { httpGetActAccPmtList, httpPostActAccPmt } from '@/api/actualAcceptPayment'
-import { transformDateFormat, getDisplayDateFormat } from '@/util/utils'
+import { httpGetSumList, httpPostSum } from '@/api/sum'
+import { copyObjWhenKeyEqual, transformDateFormat, getDisplayDateFormat } from '@/util/utils'
 
 export default {
-    name: 'ActualAcceptPayment',
+    name: 'Sum',
     data() {
         const validAmount = (rule, value, callback) => {
             if (value < 0) {
@@ -75,47 +76,52 @@ export default {
                 displayItems: {
                     项目名称: 'projectName',
                     项目编号: 'projectNumber',
-                    主合同金额总额: 'contractAmountTotal',
-                    预计总收入: 'incomeAmountTotal',
                     当期年月: 'stage'
                 },
-                editItems: {
-                    累计营收: 'accumulatedRevenue',
-                    当期两金: 'currentTwoAmount',
-                    未完施工: 'unfinishedConstructionFee',
-                    应收账款: 'accountsReceivable',
+                dispalyNumItems: {
+                    实施机构: 'agency',
+                    回款前付款: 'paymentBeforeRemittance',
+                    回款后付款: 'paymentAfterRemittance',
+                    计划外收费: 'unplannedCharges',
+                    计划外付费: 'unplannedPayment',
+                    当月计划付款: 'currentPlannedPayment',
+                    形象进度: 'projectImageProgress',
                     累计实际收费: 'accumulatedActualCharges',
-                    当期收费: 'currentCharge',
                     累计实际付费: 'accumulatedActualPayment',
-                    当期付费: 'currentPayment',
-                    利润偏差: 'profitDeviation',
                     结转营收比例: 'settlementRevenueProportion',
                     实际收费比例: 'actualChargeProportion',
-                    实际付费比例: 'actualPaymentProportion'
+                    利润偏差: 'profitDeviation',
+                    累计计划收费: 'cumulateIncome',
+                    当期两金: 'currentTwoAmount',
+                    当月计划两金余额: 'balanceOfCurrentTwoAmount',
+                    当月计划收费: 'currentPlannedCharge'
+                },
+                editItems: {
+                    // 实施机构: 'agency',
+                    回款前付款: 'paymentBeforeRemittance',
+                    回款后付款: 'paymentAfterRemittance',
+                    计划外收费: 'unplannedCharges',
+                    计划外付费: 'unplannedPayment',
+                    当月计划付款: 'currentPlannedPayment',
+                    形象进度: 'projectImageProgress'
                 }
             },
-            initActAccPmtForm: {
+            initSumForm: {
                 projectName: '',
                 projectNumber: '',
-                contractAmountTotal: '',
-                incomeAmountTotal: '',
                 stage: '',
-                accumulatedRevenue: '',
-                currentTwoAmount: '',
-                unfinishedConstructionFee: '',
-                accountsReceivable: '',
-                accumulatedActualCharges: '',
-                currentCharge: '',
-                accumulatedActualPayment: '',
-                currentPayment: '',
-                profitDeviation: '',
-                settlementRevenueProportion: '',
-                actualChargeProportion: '',
-                actualPaymentProportion: ''
+                agency: '',
+                paymentBeforeRemittance: '',
+                paymentAfterRemittance: '',
+                unplannedCharges: '',
+                unplannedPayment: '',
+                currentPlannedPayment: '',
+                projectImageProgress: ''
             },
-            actAccPmtForm: {},
+            sumForm: {},
             operation: '',
             rules: {
+                required: [{ required: true, message: '请填写实施机构', trigger: 'blur' }],
                 amountRequired: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
                     { type: 'number', message: '金额必须为数字' },
@@ -127,14 +133,14 @@ export default {
                 ]
             },
 
-            actAccPmtList: [],
-            filteredActAccPmtList: []
+            sumList: [],
+            filteredSumList: []
         }
     },
     computed: {},
     watch: {
         searchKeyWord(newVal) {
-            this.filteredActAccPmtList = this.actAccPmtList.filter(item => {
+            this.filteredSumList = this.sumList.filter(item => {
                 const a = !newVal
                 const b = item.projectName.toLowerCase().includes(newVal.toLowerCase())
                 const c = item.projectNumber.includes(newVal)
@@ -149,10 +155,10 @@ export default {
     methods: {
         async getData() {
             try {
-                const { data } = await httpGetActAccPmtList()
+                const { data } = await httpGetSumList()
                 if (data && data.code === 200) {
-                    this.actAccPmtList = data.data.list
-                    this.filteredActAccPmtList = this.actAccPmtList
+                    this.sumList = data.data.list
+                    this.filteredSumList = this.sumList
                 }
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
@@ -164,13 +170,13 @@ export default {
             //     return
             // }
             try {
-                const { data } = await httpGetActAccPmtList({
+                const { data } = await httpGetSumList({
                     projectName: this.searchKeyWord,
                     stage: this.searchDate ? transformDateFormat(this.searchDate) : ''
                 })
                 if (data && data.code === 200) {
-                    this.actAccPmtList = data.data.list
-                    this.filteredActAccPmtList = this.actAccPmtList
+                    this.sumList = data.data.list
+                    this.filteredSumList = this.sumList
                 }
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
@@ -178,13 +184,14 @@ export default {
         },
 
         handleAdd() {
-            this.actAccPmtForm = JSON.parse(JSON.stringify(this.initActAccPmtForm))
+            this.sumForm = JSON.parse(JSON.stringify(this.initSumForm))
             this.index = -1
             this.operation = 'add'
             this.dialogVisible = true
         },
         handleEdit(index, row) {
-            this.actAccPmtForm = row
+            this.sumForm = JSON.parse(JSON.stringify(this.initSumForm))
+            copyObjWhenKeyEqual(row, this.sumForm)
             this.index = index
             this.operation = 'update'
             this.dialogVisible = true
@@ -198,7 +205,7 @@ export default {
             })
                 .then(() => {
                     // TODO http
-                    this.actAccPmtList.splice(index, 1)
+                    this.sumList.splice(index, 1)
                     ElMessage({
                         type: 'success',
                         message: '删除成功'
@@ -213,14 +220,14 @@ export default {
         },
         async save() {
             try {
-                const { data } = await httpPostActAccPmt(this.actAccPmtForm)
+                const { data } = await httpPostSum(this.sumForm)
                 if (data || data.code === 200) {
                     ElMessage({ type: 'success', message: '提交成功！' })
                     // TODO 临时逻辑
                     if (this.operation === 'add') {
-                        this.actAccPmtList.push(this.actAccPmtForm)
+                        this.sumList.push(this.sumForm)
                     } else if (this.operation === 'update') {
-                        this.actAccPmtList.splice(this.index, 1, this.actAccPmtForm)
+                        this.sumList.splice(this.index, 1, this.sumForm)
                     }
                 } else {
                     ElMessage({ type: 'error', message: data.msg })
@@ -234,10 +241,10 @@ export default {
             this.dialogVisible = false
         },
         resetForm() {
-            this.$refs.actAccPmtForm.resetFields()
+            this.$refs.sumForm.resetFields()
         },
         submitForm() {
-            this.$refs.actAccPmtForm.validate(valid => {
+            this.$refs.sumForm.validate(valid => {
                 if (valid) {
                     this.save()
                 } else {
