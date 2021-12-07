@@ -1,9 +1,10 @@
-import axios, { AxiosPromise, AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-import { ElMessage } from 'element-plus'
+// import axios, { AxiosPromise, AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, { AxiosPromise, AxiosInstance } from 'axios'
+// import { ElMessage } from 'element-plus'
 
 const http:AxiosInstance = axios.create({
-  // baseURL: 'http://localhost:8080/api/'
-  baseURL: '/'
+  // baseURL: 'http://47.105.93.81:8709/'
+  baseURL: '/api'
 })
 
 // http.interceptors.request.use((config:AxiosRequestConfig) => {
