@@ -1,8 +1,8 @@
 import { get, post } from '@/util/httpRequests'
 import { AxiosPromise } from 'axios'
 
-export const httpGetContractList = () :AxiosPromise => {
-    return get('/contract/listProjectName','')
+export const httpGetContractList = (data:any) :AxiosPromise => {
+    return get('/contract/list', data)
     // console.log('httpGetContractList')
     // return get('/api/contractList.json','') //mock
 }

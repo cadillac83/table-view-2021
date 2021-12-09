@@ -161,7 +161,12 @@ export default {
     methods: {
         async getData() {
             try {
-                const { data } = await httpGetSumList()
+                const { data } = await httpGetSumList({
+                    projectName: '',
+                    stage: '',
+                    currPage: 1,
+                    pageSize: 999
+                })
                 if (data && data.code === 200) {
                     this.sumList = data.data.list
                     this.filteredSumList = this.sumList
@@ -178,7 +183,9 @@ export default {
             try {
                 const { data } = await httpGetSumList({
                     projectName: this.searchKeyWord,
-                    stage: this.searchDate ? transformDateFormat(this.searchDate) : ''
+                    stage: this.searchDate ? transformDateFormat(this.searchDate) : '',
+                    currPage: 1,
+                    pageSize: 999
                 })
                 if (data && data.code === 200) {
                     this.sumList = data.data.list
