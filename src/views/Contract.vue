@@ -55,7 +55,7 @@
             <el-table-column label="操作" fixed="right" align="center" width="180">
                 <template #default="scope">
                     <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -63,8 +63,8 @@
 
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建合同' : '编辑合同'" width="60%">
         <el-form ref="contractForm" :model="contractForm" label-width="120px" :label-position="'right'" :rules="rules">
-            <el-form-item v-if="operation === 'update'" label="项目编号" prop="projectNumber">
-                <el-input v-model="contractForm.projectNumber" disabled></el-input>
+            <el-form-item label="项目编号" prop="projectNumber">
+                <el-input v-model="contractForm.projectNumber"></el-input>
             </el-form-item>
             <el-form-item label="项目名称" prop="projectName">
                 <el-input v-model="contractForm.projectName"></el-input>
@@ -191,6 +191,13 @@ export default {
             },
             operation: '',
             rules: {
+                projectNumber: [
+                    {
+                        required: true,
+                        message: '请填写项目编号',
+                        trigger: 'blur'
+                    }
+                ],
                 projectName: [
                     {
                         required: true,
@@ -249,7 +256,11 @@ export default {
     methods: {
         async getData() {
             try {
-                const { data } = await httpGetContractList()
+                const { data } = await httpGetContractList({
+                    projectName: '',
+                    currPage: 1,
+                    pageSize: 999
+                })
                 if (data && data.code === 200) {
                     this.contractList = data.data.list
                     this.filteredContractList = this.contractList
@@ -302,7 +313,7 @@ export default {
                     ElMessage({ type: 'success', message: '提交成功！' })
                     // TODO 临时逻辑
                     if (this.operation === 'add') {
-                        this.contractForm.projectNumber = 'test000001'
+                        // this.contractForm.projectNumber = 'test000001'
                         this.contractList.push(this.contractForm)
                     } else if (this.operation === 'update') {
                         this.contractList.splice(this.index, 1, this.contractForm)

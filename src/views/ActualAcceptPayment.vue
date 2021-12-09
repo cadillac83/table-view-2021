@@ -155,7 +155,12 @@ export default {
     methods: {
         async getData() {
             try {
-                const { data } = await httpGetActAccPmtList()
+                const { data } = await httpGetActAccPmtList({
+                    projectName: this.searchKeyWord,
+                    stage: this.searchDate ? transformDateFormat(this.searchDate) : '',
+                    currPage: 1,
+                    pageSize: 999
+                })
                 if (data && data.code === 200) {
                     this.actAccPmtList = data.data.list
                     this.filteredActAccPmtList = this.actAccPmtList
@@ -172,7 +177,9 @@ export default {
             try {
                 const { data } = await httpGetActAccPmtList({
                     projectName: this.searchKeyWord,
-                    stage: this.searchDate ? transformDateFormat(this.searchDate) : ''
+                    stage: this.searchDate ? transformDateFormat(this.searchDate) : '',
+                    currPage: 1,
+                    pageSize: 999
                 })
                 if (data && data.code === 200) {
                     this.actAccPmtList = data.data.list
