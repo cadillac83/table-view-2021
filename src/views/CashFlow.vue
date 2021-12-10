@@ -174,7 +174,9 @@ export default {
     watch: {
         async targetProjectNumber(newVal) {
             try {
-                const { data } = await httpGetCashOfContractList(newVal)
+                const { data } = await httpGetCashOfContractList({
+                    projectNumber: newVal
+                })
                 if (data || data.code === 200) {
                     this.cashFlowList = data.data.cashFlowList.sort((a, b) => (a.stage > b.stage ? 1 : -1))
                 } else {
@@ -266,6 +268,7 @@ export default {
             this.$refs.cashFlowForm.validate(valid => {
                 if (valid) {
                     this.cashFlowForm.stage = this.transformDateFormat(this.cashFlowForm.stage)
+                    this.cashFlowForm.projectNumber = this.targetProjectNumber
                     this.cashFlowList.push(this.cashFlowForm)
                     this.cashFlowList = this.cashFlowList.sort((a, b) => (a.stage > b.stage ? 1 : -1))
                     this.isModified = true
