@@ -64,7 +64,8 @@
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建合同' : '编辑合同'" width="60%">
         <el-form ref="contractForm" :model="contractForm" label-width="120px" :label-position="'right'" :rules="rules">
             <el-form-item label="项目编号" prop="projectNumber">
-                <el-input v-model="contractForm.projectNumber"></el-input>
+                <el-input v-if="operation === 'add'" v-model="contractForm.projectNumber"></el-input>
+                <el-input v-else v-model="contractForm.projectNumber" disabled></el-input>
             </el-form-item>
             <el-form-item label="项目名称" prop="projectName">
                 <el-input v-model="contractForm.projectName"></el-input>
