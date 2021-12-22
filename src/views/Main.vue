@@ -10,7 +10,10 @@
             <el-tab-pane label="实际收付费记录表" name="third">
                 <ActualAcceptPayment />
             </el-tab-pane>
-            <el-tab-pane label="输出总表" name="fourth">
+            <el-tab-pane label="统计图" name="fourth">
+                <Statistics />
+            </el-tab-pane>
+            <el-tab-pane label="输出总表" name="five">
                 <Sum />
             </el-tab-pane>
         </el-tabs>
@@ -22,10 +25,11 @@ import Contract from './Contract.vue'
 import CashFlow from './CashFlow.vue'
 import Sum from './Sum.vue'
 import ActualAcceptPayment from './ActualAcceptPayment.vue'
+import Statistics from './Statistics.vue'
 
 export default {
     name: 'Main',
-    components: { Contract, CashFlow, Sum, ActualAcceptPayment },
+    components: { Contract, CashFlow, Sum, ActualAcceptPayment, Statistics },
     data() {
         return {
             activeName: 'first'

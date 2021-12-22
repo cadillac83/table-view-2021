@@ -1,0 +1,69 @@
+{
+    "msg": "success",
+    "code": 200,
+    "data": [
+        {
+            "stage": "2021-03",
+            "cumulateIncome": 0.0,
+            "cumulateOutcome": 398.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-04",
+            "cumulateIncome": 16323.0,
+            "cumulateOutcome": 9961.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-05",
+            "cumulateIncome": 16323.0,
+            "cumulateOutcome": 29180.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-06",
+            "cumulateIncome": 16323.0,
+            "cumulateOutcome": 32970.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-07",
+            "cumulateIncome": 40807.0,
+            "cumulateOutcome": 52914.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-08",
+            "cumulateIncome": 134470.0,
+            "cumulateOutcome": 118550.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-09",
+            "cumulateIncome": 220036.0,
+            "cumulateOutcome": 208235.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-10",
+            "cumulateIncome": 363036.0,
+            "cumulateOutcome": 334229.0,
+            "accumulatedActualCharges": 0.0,
+            "accumulatedActualPayment": 0.0
+        },
+        {
+            "stage": "2021-11",
+            "cumulateIncome": 469469.0,
+            "cumulateOutcome": 381614.0,
+            "accumulatedActualCharges": 95379.0,
+            "accumulatedActualPayment": 92992.0
+        }
+    ]
+}
