@@ -35,7 +35,7 @@
             <el-table-column prop="income" label="收费" align="center">
                 <template #default="scope">
                     <div v-if="isEditMode">
-                        <el-input v-model.number="scope.row.income" @change="modifiedCashFlowList"></el-input>
+                        <el-input v-model="scope.row.income" @change="modifiedCashFlowList"></el-input>
                     </div>
                     <div v-else>{{ scope.row.income }}</div>
                 </template>
@@ -43,7 +43,7 @@
             <el-table-column prop="outcome" label="付费" align="center">
                 <template #default="scope">
                     <div v-if="isEditMode">
-                        <el-input v-model.number="scope.row.outcome" @change="modifiedCashFlowList"></el-input>
+                        <el-input v-model="scope.row.outcome" @change="modifiedCashFlowList"></el-input>
                     </div>
                     <div v-else>{{ scope.row.outcome }}</div>
                 </template>
@@ -78,10 +78,10 @@
                 </el-row>
             </el-form-item>
             <el-form-item label="收费" prop="income">
-                <el-input v-model.number="cashFlowForm.income"></el-input>
+                <el-input v-model="cashFlowForm.income"></el-input>
             </el-form-item>
             <el-form-item label="付费" prop="outcome">
-                <el-input v-model.number="cashFlowForm.outcome"></el-input>
+                <el-input v-model="cashFlowForm.outcome"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -101,7 +101,11 @@ export default {
     name: 'CashFlow',
     data() {
         const validAmount = (rule, value, callback) => {
-            if (value < 0) {
+            const valueNumber = parseFloat(value)
+            if (!valueNumber) {
+                callback(new Error('金额必须为数字类型！'))
+            }
+            if (valueNumber < 0) {
                 callback(new Error('金额不能小于零！'))
             }
             callback()
@@ -136,12 +140,12 @@ export default {
 
                 income: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ],
                 outcome: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ]
             }
@@ -157,14 +161,14 @@ export default {
                 if (index === 0) {
                     currentCCF.cumulateIncome = currentCCF.income
                     currentCCF.cumulateOutcome = currentCCF.outcome
-                    currentCCF.stageCashFlow = currentCCF.income - currentCCF.outcome
-                    currentCCF.cumulateCashFLow = currentCCF.income - currentCCF.outcome
+                    currentCCF.stageCashFlow = this.subtract(currentCCF.income, currentCCF.outcome)
+                    currentCCF.cumulateCashFLow = this.subtract(currentCCF.income, currentCCF.outcome)
                 } else {
                     preCCF = this.cashFlowList[index - 1]
-                    currentCCF.cumulateIncome = currentCCF.income + preCCF.cumulateIncome // 当前月的收费 + 上个月的累计计划收费
-                    currentCCF.cumulateOutcome = currentCCF.outcome + preCCF.cumulateOutcome // 当前月的付费 + 上个月的累计计划付费
-                    currentCCF.stageCashFlow = currentCCF.income - currentCCF.outcome // 收费-付费
-                    currentCCF.cumulateCashFLow = currentCCF.cumulateIncome - currentCCF.cumulateOutcome // 累计收费-累计付费
+                    currentCCF.cumulateIncome = this.add(currentCCF.income, preCCF.cumulateIncome) // 当前月的收费 + 上个月的累计计划收费
+                    currentCCF.cumulateOutcome = this.add(currentCCF.outcome, preCCF.cumulateOutcome) // 当前月的付费 + 上个月的累计计划付费
+                    currentCCF.stageCashFlow = this.subtract(currentCCF.income, currentCCF.outcome) // 收费-付费
+                    currentCCF.cumulateCashFLow = this.subtract(currentCCF.cumulateIncome, currentCCF.cumulateOutcome) // 累计收费-累计付费
                 }
                 ccfList.push(currentCCF)
             }
@@ -283,6 +287,12 @@ export default {
         },
         getDisplayDateFormat(stage) {
             return `${stage.slice(0, 4)}年${stage.slice(5, 7)}月`
+        },
+        add(a, b) {
+            return parseFloat(a) + parseFloat(b)
+        },
+        subtract(a, b) {
+            return parseFloat(a) - parseFloat(b)
         }
     }
 }

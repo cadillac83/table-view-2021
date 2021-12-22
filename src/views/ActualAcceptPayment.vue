@@ -46,7 +46,7 @@
                 <el-input v-else v-model="actAccPmtForm[itemName]" disabled></el-input>
             </el-form-item>
             <el-form-item v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :label="itemLabel" :prop="itemName" :rules="rules.amountRequired">
-                <el-input v-model.number="actAccPmtForm[itemName]"></el-input>
+                <el-input v-model="actAccPmtForm[itemName]"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -67,7 +67,11 @@ export default {
     name: 'ActualAcceptPayment',
     data() {
         const validAmount = (rule, value, callback) => {
-            if (value < 0) {
+            const valueNumber = parseFloat(value)
+            if (!valueNumber) {
+                callback(new Error('金额必须为数字类型！'))
+            }
+            if (valueNumber < 0) {
                 callback(new Error('金额不能小于零！'))
             }
             callback()
@@ -124,11 +128,11 @@ export default {
             rules: {
                 amountRequired: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ],
                 amount: [
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ]
             },

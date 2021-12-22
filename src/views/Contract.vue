@@ -74,62 +74,62 @@
                 <el-input v-model="contractForm.projectShorterName"></el-input>
             </el-form-item>
             <el-form-item label="主合同金额总额" prop="contractAmountTotal" :rules="rules.amountTotal">
-                <el-input v-model.number="contractForm.contractAmountTotal"></el-input>
+                <el-input v-model="contractForm.contractAmountTotal"></el-input>
             </el-form-item>
             <el-row>
                 <el-col :span="8">
                     <el-form-item label="细分" prop="contractAmountBuild" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.contractAmountBuild"> <template #prepend>建安</template></el-input>
+                        <el-input v-model="contractForm.contractAmountBuild"> <template #prepend>建安</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="contractAmountEquip" label-width="0" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.contractAmountEquip"> <template #prepend>设备采购</template></el-input>
+                        <el-input v-model="contractForm.contractAmountEquip"> <template #prepend>设备采购</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="contractAmountOther" label-width="0" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.contractAmountOther"> <template #prepend>其他</template></el-input>
+                        <el-input v-model="contractForm.contractAmountOther"> <template #prepend>其他</template></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-form-item label="预计总收入" prop="incomeAmountTotal" :rules="rules.amountTotal">
-                <el-input v-model.number="contractForm.incomeAmountTotal"></el-input>
+                <el-input v-model="contractForm.incomeAmountTotal"></el-input>
             </el-form-item>
             <el-row>
                 <el-col :span="8">
                     <el-form-item label="细分" prop="incomeAmountBuild" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.incomeAmountBuild"> <template #prepend>建安</template></el-input>
+                        <el-input v-model="contractForm.incomeAmountBuild"> <template #prepend>建安</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="incomeAmountEquip" label-width="0" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.incomeAmountEquip"> <template #prepend>设备采购</template></el-input>
+                        <el-input v-model="contractForm.incomeAmountEquip"> <template #prepend>设备采购</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="incomeAmountOther" label-width="0" :rules="rules.amount">
-                        <el-input v-model.number="contractForm.incomeAmountOther"> <template #prepend>其他</template></el-input>
+                        <el-input v-model="contractForm.incomeAmountOther"> <template #prepend>其他</template></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-form-item label="预计总成本" prop="costAmountTotal" :rules="rules.amountTotal">
-                <el-input v-model.number="contractForm.costAmountTotal"></el-input>
+                <el-input v-model="contractForm.costAmountTotal"></el-input>
             </el-form-item>
             <el-row>
                 <el-col :span="8">
                     <el-form-item label="细分" prop="costAmountBuild">
-                        <el-input v-model.number="contractForm.costAmountBuild" :rules="rules.amount"> <template #prepend>建安</template></el-input>
+                        <el-input v-model="contractForm.costAmountBuild" :rules="rules.amount"> <template #prepend>建安</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="costAmountEquip" label-width="0">
-                        <el-input v-model.number="contractForm.costAmountEquip" :rules="rules.amount"> <template #prepend>设备采购</template></el-input>
+                        <el-input v-model="contractForm.costAmountEquip" :rules="rules.amount"> <template #prepend>设备采购</template></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
                     <el-form-item prop="costAmountOther" label-width="0">
-                        <el-input v-model.number="contractForm.costAmountOther" :rules="rules.amount"> <template #prepend>其他</template></el-input>
+                        <el-input v-model="contractForm.costAmountOther" :rules="rules.amount"> <template #prepend>其他</template></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -157,7 +157,11 @@ export default {
     name: 'Contract',
     data() {
         const validAmount = (rule, value, callback) => {
-            if (value < 0) {
+            const valueNumber = parseFloat(value)
+            if (!valueNumber) {
+                callback(new Error('金额必须为数字类型！'))
+            }
+            if (valueNumber < 0) {
                 callback(new Error('金额不能小于零！'))
             }
             callback()
@@ -215,11 +219,11 @@ export default {
                 ],
                 amountTotal: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ],
                 amount: [
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ]
             },
