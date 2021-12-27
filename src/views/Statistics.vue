@@ -3,7 +3,7 @@
         <el-row justify="space-between">
             <el-col :span="12">
                 <el-row justify="start">
-                    <el-select v-model="targetProjectNumber" filterable :filter-method="filterContractNameList" @focus="resetList()" @blur="resetList()" placeholder="请选择要查看的项目">
+                    <el-select v-model="targetProjectNumberList" :multiple="true" filterable :filter-method="filterContractNameList" @change="changeSelect" @remove-tag="removeTag" placeholder="请选择要查看的项目">
                         <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
                             <span class="el-option-left">{{ item.projectName }}</span>
                             <span class="el-option-right">{{ item.projectNumber }}</span>
@@ -14,6 +14,7 @@
                     </el-select>
                 </el-row>
             </el-col>
+            <el-button type="success" @click="handleSearch()">查询</el-button>
         </el-row>
     </div>
     <div id="statChart" ref="statChart"></div>
@@ -27,7 +28,9 @@ export default {
     name: 'Statistics',
     data() {
         return {
-            targetProjectNumber: '',
+            targetProjectNumbers: '',
+            targetProjectNumberList: [],
+            targetProjectNameList: [],
             filteredContractNameList: [],
             mockData: {
                 msg: 'success',
@@ -97,29 +100,42 @@ export default {
                         accumulatedActualPayment: 92992.0
                     }
                 ]
-            }
+            },
+            stageList: [],
+            cumulateIncomeList: [],
+            cumulateOutcomeList: [],
+            accumulatedActualChargesList: [],
+            accumulatedActualPaymentList: []
         }
     },
-    watch: {
-        async targetProjectNumber(newVal) {
-            try {
-                const { data } = await httpStatisticsOfContract({
-                    projectNumber: newVal
-                })
-                if (data || data.code === 200) {
-                    this.statisticsData = data.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
-                } else {
-                    ElMessage({ type: 'error', message: data.msg })
-                }
-            } catch (error) {
-                ElMessage({ type: 'error', message: error })
-                // mock data
-                this.statisticsData = this.mockData.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
-                console.log('this.statisticsData', this.statisticsData)
-                this.initChart()
-            }
-        }
-    },
+    // watch: {
+    //     async targetProjectNumber(newVal) {
+    //         try {
+    //             const { data } = await httpStatisticsOfContract({
+    //                 projectNumbers: newVal
+    //             })
+    //             if (data || data.code === 200) {
+    //                 this.statisticsData = data.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
+    //                 this.initChart()
+    //             } else {
+    //                 ElMessage({ type: 'error', message: data.msg })
+    //             }
+    //         } catch (error) {
+    //             ElMessage({ type: 'error', message: error })
+    //             // mock data
+    //             // this.statisticsData = this.mockData.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
+    //             // console.log('this.statisticsData', this.statisticsData)
+    //             this.initChart()
+    //         }
+    //     }
+    // },
+    // watch: {
+    //     searchKeyWord(newVal) {
+    //         console.log('targetProjectNumberList:', this.targetProjectNumberList)
+    //         this.targetProjectNumbers = this.targetProjectNumberList
+    //         return this.targetProjectNumbers
+    //     }
+    // },
     created() {
         this.getData()
     },
@@ -129,13 +145,56 @@ export default {
                 const { data } = await httpGetContractNameList()
                 this.contractNameList = data.data
                 this.filteredContractNameList = this.contractNameList
-                if (this.filteredContractNameList.length > 0) {
-                    this.targetProjectNumber = this.filteredContractNameList[0].projectNumber
-                }
+                // if (this.filteredContractNameList.length > 0) {
+                //     this.targetProjectNumbers = this.filteredContractNameList[0].projectNumber
+                // }
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
             }
         },
+        async handleSearch() {
+            try {
+                const { data } = await httpStatisticsOfContract(this.targetProjectNumberList)
+                if (data || data.code === 200) {
+                    this.statisticsData = data.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
+                    this.initChart()
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+                // mock data
+                // this.statisticsData = this.mockData.data.sort((a, b) => (a.stage > b.stage ? 1 : -1))
+                this.initChart()
+            }
+        },
+        // selectAll() {
+        //     if (this.targetProjectNumberList.length < this.filteredContractNameList.length) {
+        //         this.targetProjectNumberList = []
+        //         this.filteredContractNameList.map(item => {
+        //             this.targetProjectNumberList.push(item.projectNumber)
+        //         })
+        //         this.targetProjectNumberList.unshift('全选')
+        //     } else {
+        //         this.targetProjectNumberList = []
+        //     }
+        //     // eslint-disable-next-line no-unused-vars
+        //     console.log('选择的:', this.targetProjectNumbers)
+        // },
+        // changeSelect(val) {
+        //     if (!val.includes('全选') && val.length === this.options.length) {
+        //         this.targetProjectNumberList.unshift('全选')
+        //     } else if (val.includes('全选') && val.length - 1 < this.dataArray.length) {
+        //         this.targetProjectNumberList = this.targetProjectNumberList.filter(item => {
+        //             return item !== '全选'
+        //         })
+        //     }
+        // },
+        // removeTag(val) {
+        //     if (val === '全选') {
+        //         this.targetProjectNumberList = []
+        //     }
+        // },
         filterContractNameList(val) {
             if (val) {
                 this.filteredContractNameList = this.contractNameList.filter(item => {
@@ -153,19 +212,53 @@ export default {
         initChart() {
             const myChart = echarts.init(this.$refs.statChart)
             const option = this.getOption(this.statisticsData)
-            console.log('打印实例查看 myChart ==>', myChart)
+            this.getStage()
+            this.getCumulateIncome()
+            this.getCumulateOutcome()
+            this.getaccumulatedActualCharges()
+            this.getaccumulatedActualPayment()
             myChart.setOption(option)
+        },
+        getStage() {
+            this.stageList.length = 0
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                this.stageList.push(this.statisticsData[i].stage)
+            }
+        },
+        getCumulateIncome() {
+            this.cumulateIncomeList.length = 0
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                this.cumulateIncomeList.push(this.statisticsData[i].cumulateIncome)
+            }
+        },
+        getCumulateOutcome() {
+            this.cumulateOutcomeList.length = 0
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                this.cumulateOutcomeList.push(this.statisticsData[i].cumulateOutcome)
+            }
+        },
+        getaccumulatedActualCharges() {
+            this.accumulatedActualChargesList.length = 0
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                this.accumulatedActualChargesList.push(this.statisticsData[i].accumulatedActualCharges)
+            }
+        },
+        getaccumulatedActualPayment() {
+            this.accumulatedActualPaymentList.length = 0
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                this.accumulatedActualPaymentList.push(this.statisticsData[i].accumulatedActualPayment)
+            }
         },
         getOption(data) {
             return {
                 title: {
-                    text: 'Stacked Line'
+                    text: '工程计划&实际收付费金额曲线'
                 },
                 tooltip: {
                     trigger: 'axis'
                 },
                 legend: {
-                    data: ['Email', 'Union Ads', 'Video Ads', 'Direct']
+                    data: ['计划收', '计划付', '实际收', '实际付']
                 },
                 grid: {
                     left: '3%',
@@ -181,35 +274,31 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                    data: this.stageList
                 },
                 yAxis: {
                     type: 'value'
                 },
                 series: [
                     {
-                        name: 'Email',
+                        name: '计划收',
                         type: 'line',
-                        stack: 'Total',
-                        data: [120, 132, 101, 134, 90, 230, 210]
+                        data: this.cumulateIncomeList
                     },
                     {
-                        name: 'Union Ads',
+                        name: '计划付',
                         type: 'line',
-                        stack: 'Total',
-                        data: [220, 182, 191, 234, 290, 330, 310]
+                        data: this.cumulateOutcomeList
                     },
                     {
-                        name: 'Video Ads',
+                        name: '实际收',
                         type: 'line',
-                        stack: 'Total',
-                        data: [150, 232, 201, 154, 190, 330, 410]
+                        data: this.accumulatedActualChargesList
                     },
                     {
-                        name: 'Direct',
+                        name: '实际付',
                         type: 'line',
-                        stack: 'Total',
-                        data: [320, 332, 301, 334, 390, 330, 320]
+                        data: this.accumulatedActualPaymentList
                     }
                 ]
             }

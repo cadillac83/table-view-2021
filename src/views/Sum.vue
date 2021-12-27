@@ -2,7 +2,7 @@
     <div>
         <div class="opration-line">
             <el-row justify="space-between">
-                <el-col :span="16">
+                <el-col :span="12">
                     <el-row justify="start">
                         <el-col :span="12">
                             <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号" clearable>
@@ -15,6 +15,13 @@
                         </el-col>
                         <el-date-picker v-model="searchDate" type="month" placeholder="请选择年月" format="YYYY年MM月"> </el-date-picker>
                         <el-button type="success" @click="handleSearch()">查询</el-button>
+                    </el-row>
+                </el-col>
+                <el-col :span="12">
+                    <el-row justify="end">
+                        <div class="add-button">
+                            <el-button type="success" @click="handleAdd()">新建</el-button>
+                        </div>
                     </el-row>
                 </el-col>
             </el-row>
@@ -40,7 +47,8 @@
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建总表' : '编辑总表'" width="40%">
         <el-form ref="sumForm" :model="sumForm" label-width="120px" :label-position="'right'">
             <el-form-item v-for="(itemName, itemLabel) in itemMap.displayItems" :key="itemName" :label="itemLabel" :prop="itemName">
-                <el-input v-if="itemName === 'stage'" :modelValue="getDisplayDateFormat(sumForm[itemName])" disabled></el-input>
+                <el-input v-if="operation === 'add'" v-model="sumForm[itemName]"></el-input>
+                <el-input v-else-if="operation !== 'add' && itemName === 'stage'" :modelValue="getDisplayDateFormat(sumForm[itemName])" disabled></el-input>
                 <el-input v-else v-model="sumForm[itemName]" disabled></el-input>
             </el-form-item>
             <el-form-item label="实施机构" prop="agency" :rules="rules.required">
