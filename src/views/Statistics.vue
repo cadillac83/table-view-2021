@@ -3,7 +3,7 @@
         <el-row justify="space-between">
             <el-col :span="12">
                 <el-row justify="start">
-                    <el-select v-model="targetProjectNumberList" :multiple="true" filterable :filter-method="filterContractNameList" @change="changeSelect" @remove-tag="removeTag" placeholder="请选择要查看的项目">
+                    <el-select v-model="targetProjectNumberList" :multiple="true" filterable collapse-tags :filter-method="filterContractNameList" @change="changeSelect" @remove-tag="removeTag" placeholder="请选择要查看的项目">
                         <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
                             <span class="el-option-left">{{ item.projectName }}</span>
                             <span class="el-option-right">{{ item.projectNumber }}</span>
@@ -14,7 +14,13 @@
                     </el-select>
                 </el-row>
             </el-col>
-            <el-button type="success" @click="handleSearch()">查询</el-button>
+            <el-col :span="12">
+                <el-row justify="end">
+                    <div class="add-button">
+                        <el-button type="success" @click="handleSearch()">查询</el-button>
+                    </div>
+                </el-row>
+            </el-col>
         </el-row>
     </div>
     <div id="statChart" ref="statChart"></div>

@@ -23,7 +23,9 @@ export const httpGetActAccPmtDetail = (data:any) :AxiosPromise => {
     // }
    
 }
-
+export const httpGetDetailOfContractList = (data:any) :AxiosPromise => {
+    return get('/contract/detail',data)
+}
 export const httpPostActAccPmt = (data:object) :AxiosPromise => {
     return post('/history/save', data)
     // console.log('httpPostActAccPmt data:',data)

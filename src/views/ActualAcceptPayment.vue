@@ -2,7 +2,7 @@
     <div>
         <div class="opration-line">
             <el-row justify="space-between">
-                <el-col :span="16">
+                <el-col :span="12">
                     <el-row justify="start">
                         <el-col :span="12">
                             <el-input v-model="searchKeyWord" placeholder="请输入项目名称或项目编号" clearable>
@@ -17,6 +17,13 @@
                         <el-button type="success" @click="handleSearch()">查询</el-button>
                     </el-row>
                 </el-col>
+                <el-col :span="12">
+                    <el-row justify="end">
+                        <div class="add-button">
+                            <el-button type="success" @click="handleAdd()">新建</el-button>
+                        </div>
+                    </el-row>
+                </el-col>
             </el-row>
         </div>
         <el-table :data="filteredActAccPmtList" height="calc(100vh - 135px)" stripe>
@@ -29,7 +36,7 @@
                     <div>{{ getDisplayDateFormat(scope.row.stage) }}</div>
                 </template>
             </el-table-column>
-            <el-table-column v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :prop="itemName" :label="itemLabel" align="center" width="120" />
+            <el-table-column v-for="(itemName, itemLabel) in itemMap.tableItems" :key="itemName" :prop="itemName" :label="itemLabel" align="center" width="120" />
             <el-table-column label="操作" fixed="right" align="center" width="120">
                 <template #default="scope">
                     <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -41,9 +48,25 @@
 
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建实际收付费记录' : '编辑实际收付费记录'" width="40%">
         <el-form ref="actAccPmtForm" :model="actAccPmtForm" label-width="120px" :label-position="'right'">
-            <el-form-item v-for="(itemName, itemLabel) in itemMap.displayItems" :key="itemName" :label="itemLabel" :prop="itemName">
-                <el-input v-if="itemName === 'stage'" :modelValue="getDisplayDateFormat(actAccPmtForm[itemName])" disabled></el-input>
-                <el-input v-else v-model="actAccPmtForm[itemName]" disabled></el-input>
+            <el-form-item label="项目编号" prop="projectNumber">
+                <el-select v-if="operation === 'add'" v-model="targetProjectNumber" filterable :filter-method="filterContractNameList" @focus="resetList()" @change="changeSelect" @remove-tag="removeTag" placeholder="请选择要新增的项目" style="width: 100%">
+                    <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
+                        <span class="el-option-left">{{ item.projectName }}</span>
+                        <span class="el-option-right">{{ item.projectNumber }}</span>
+                    </el-option>
+                    <template #prefix>
+                        <el-icon size="16px"><i-list /></el-icon>
+                    </template>
+                </el-select>
+                <el-input v-else v-model="actAccPmtForm['projectNumber']" disabled> </el-input>
+            </el-form-item>
+            <el-form-item label="项目名称" prop="projectName">
+                <el-input v-if="operation === 'add'" v-model="targetContract.projectName"></el-input>
+                <el-input v-else v-model="actAccPmtForm['projectName']" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="主合同金额总额" prop="contractAmountTotal">
+                <el-input v-if="operation === 'add'" v-model="targetContract.contractAmountTotal"></el-input>
+                <el-input v-else v-model="actAccPmtForm['contractAmountTotal']" disabled></el-input>
             </el-form-item>
             <el-form-item v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :label="itemLabel" :prop="itemName" :rules="rules.amountRequired">
                 <el-input v-model="actAccPmtForm[itemName]"></el-input>
@@ -60,7 +83,8 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { httpGetActAccPmtList, httpPostActAccPmt } from '@/api/actualAcceptPayment'
+import { httpGetActAccPmtList, httpPostActAccPmt, httpGetDetailOfContractList } from '@/api/actualAcceptPayment'
+import { httpGetContractNameList } from '@/api/contract'
 import { transformDateFormat, getDisplayDateFormat } from '@/util/utils'
 
 export default {
@@ -77,14 +101,17 @@ export default {
             callback()
         }
         return {
+            filteredContractNameList: [],
+            contractNameList: [],
+            targetProjectNumber: '',
             searchKeyWord: '',
             searchDate: '',
             dialogVisible: false,
             index: 0,
             itemMap: {
                 displayItems: {
-                    项目名称: 'projectName',
                     项目编号: 'projectNumber',
+                    项目名称: 'projectName',
                     主合同金额总额: 'contractAmountTotal',
                     预计总收入: 'incomeAmountTotal',
                     当期年月: 'stage'
@@ -94,14 +121,28 @@ export default {
                     当期两金: 'currentTwoAmount',
                     未完施工: 'unfinishedConstructionFee',
                     应收账款: 'accountsReceivable',
+                    // 累计实际收费: 'accumulatedActualCharges',
+                    当期收费: 'currentCharge',
+                    // 累计实际付费: 'accumulatedActualPayment',
+                    当期付费: 'currentPayment',
+                    利润偏差: 'profitDeviation'
+                    // 结转营收比例: 'settlementRevenueProportion',
+                    // 实际收费比例: 'actualChargeProportion',
+                    // 实际付费比例: 'actualPaymentProportion'
+                },
+                tableItems: {
+                    累计营收: 'accumulatedRevenue',
+                    当期两金: 'currentTwoAmount',
+                    未完施工: 'unfinishedConstructionFee',
+                    应收账款: 'accountsReceivable',
                     累计实际收费: 'accumulatedActualCharges',
                     当期收费: 'currentCharge',
                     累计实际付费: 'accumulatedActualPayment',
                     当期付费: 'currentPayment',
-                    利润偏差: 'profitDeviation',
-                    结转营收比例: 'settlementRevenueProportion',
-                    实际收费比例: 'actualChargeProportion',
-                    实际付费比例: 'actualPaymentProportion'
+                    利润偏差: 'profitDeviation'
+                    // 结转营收比例: 'settlementRevenueProportion',
+                    // 实际收费比例: 'actualChargeProportion',
+                    // 实际付费比例: 'actualPaymentProportion'
                 }
             },
             initActAccPmtForm: {
@@ -124,6 +165,12 @@ export default {
                 actualPaymentProportion: ''
             },
             actAccPmtForm: {},
+            targetContract: {
+                projectName: '',
+                projectNumber: '',
+                contractAmountTotal: '',
+                incomeAmountTotal: ''
+            },
             operation: '',
             rules: {
                 amountRequired: [
@@ -150,11 +197,26 @@ export default {
                 const c = item.projectNumber.includes(newVal)
                 return a || b || c
             })
+        },
+        async targetProjectNumber(newVal) {
+            try {
+                const { data } = await httpGetDetailOfContractList({
+                    projectNumber: newVal
+                })
+                if (data || data.code === 200) {
+                    this.targetContract = data.data
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
         }
     },
     created() {
         this.getDisplayDateFormat = getDisplayDateFormat
         this.getData()
+        this.getProjectNameList()
     },
     methods: {
         async getData() {
@@ -172,6 +234,32 @@ export default {
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
             }
+        },
+        async getProjectNameList() {
+            try {
+                const { data } = await httpGetContractNameList()
+                this.contractNameList = data.data
+                this.filteredContractNameList = this.contractNameList
+                if (this.filteredContractNameList.length > 0) {
+                    this.targetProjectNumber = this.filteredContractNameList[0].projectNumber
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
+        filterContractNameList(val) {
+            if (val) {
+                this.filteredContractNameList = this.contractNameList.filter(item => {
+                    const a = item.projectName.includes(val)
+                    const b = item.projectNumber.includes(val)
+                    return a || b
+                })
+            } else {
+                this.filteredContractNameList = this.contractNameList
+            }
+        },
+        resetList() {
+            this.filteredContractNameList = this.contractNameList
         },
         async handleSearch() {
             // if (!this.searchKeyWord || !this.searchDate) {
@@ -271,5 +359,13 @@ export default {
 }
 .add-button {
     padding-right: 25px;
+}
+.el-option-left {
+    float: left;
+}
+.el-option-right {
+    float: right;
+    color: var(--el-text-color-secondary);
+    font-size: 13px;
 }
 </style>

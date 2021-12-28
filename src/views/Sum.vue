@@ -27,8 +27,8 @@
             </el-row>
         </div>
         <el-table :data="filteredSumList" height="calc(100vh - 135px)" stripe>
-            <el-table-column prop="projectName" label="项目名称" fixed align="center" width="140" />
             <el-table-column prop="projectNumber" label="项目编号" sortable align="center" width="120" />
+            <el-table-column prop="projectName" label="项目名称" align="center" width="140" />
             <el-table-column prop="stage" label="当期年月" align="center" width="120">
                 <template #default="scope">
                     <div>{{ getDisplayDateFormat(scope.row.stage) }}</div>
@@ -88,27 +88,27 @@ export default {
             index: 0,
             itemMap: {
                 displayItems: {
-                    项目名称: 'projectName',
                     项目编号: 'projectNumber',
+                    项目名称: 'projectName',
                     当期年月: 'stage'
                 },
                 dispalyNumItems: {
                     实施机构: 'agency',
+                    累计计划收费: 'cumulateIncome',
+                    累计实际收费: 'accumulatedActualCharges',
+                    实际收费比例: 'actualChargeProportion',
+                    当月计划收费: 'currentPlannedCharge',
+                    结转营收比例: 'settlementRevenueProportion',
+                    形象进度: 'projectImageProgress',
+                    利润偏差: 'profitDeviation',
+                    当期两金: 'currentTwoAmount',
+                    当月计划两金余额: 'balanceOfCurrentTwoAmount',
+                    累计实际付费: 'accumulatedActualPayment',
+                    当月计划付款: 'currentPlannedPayment',
                     回款前付款: 'paymentBeforeRemittance',
                     回款后付款: 'paymentAfterRemittance',
                     计划外收费: 'unplannedCharges',
-                    计划外付费: 'unplannedPayment',
-                    当月计划付款: 'currentPlannedPayment',
-                    形象进度: 'projectImageProgress',
-                    累计实际收费: 'accumulatedActualCharges',
-                    累计实际付费: 'accumulatedActualPayment',
-                    结转营收比例: 'settlementRevenueProportion',
-                    实际收费比例: 'actualChargeProportion',
-                    利润偏差: 'profitDeviation',
-                    累计计划收费: 'cumulateIncome',
-                    当期两金: 'currentTwoAmount',
-                    当月计划两金余额: 'balanceOfCurrentTwoAmount',
-                    当月计划收费: 'currentPlannedCharge'
+                    计划外付费: 'unplannedPayment'
                 },
                 editItems: {
                     // 实施机构: 'agency',
@@ -121,8 +121,9 @@ export default {
                 }
             },
             initSumForm: {
-                projectName: '',
                 projectNumber: '',
+                projectName: '',
+                // projectNumber: '',
                 stage: '',
                 agency: '',
                 paymentBeforeRemittance: '',
