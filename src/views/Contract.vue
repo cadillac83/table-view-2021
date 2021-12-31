@@ -158,12 +158,12 @@ export default {
     data() {
         const validAmount = (rule, value, callback) => {
             const valueNumber = parseFloat(value)
-            if (!valueNumber) {
+            if (!valueNumber && valueNumber !== 0) {
                 callback(new Error('金额必须为数字类型！'))
             }
-            if (valueNumber < 0) {
-                callback(new Error('金额不能小于零！'))
-            }
+            // if (valueNumber < 0) {
+            //     callback(new Error('金额不能小于零！'))
+            // }
             callback()
         }
         return {
@@ -238,7 +238,7 @@ export default {
         },
         computedIncomeCostPercentage() {
             if (this.contractForm.incomeAmountTotal > 0 && this.contractForm.costAmountTotal > 0) {
-                return this.contractForm.incomeAmountTotal / this.contractForm.costAmountTotal
+                return (this.contractForm.incomeAmountTotal / this.contractForm.costAmountTotal).toFixed(2)
             } else {
                 return 0
             }

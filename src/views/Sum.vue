@@ -15,13 +15,7 @@
                         </el-col>
                         <el-date-picker v-model="searchDate" type="month" placeholder="请选择年月" format="YYYY年MM月"> </el-date-picker>
                         <el-button type="success" @click="handleSearch()">查询</el-button>
-                    </el-row>
-                </el-col>
-                <el-col :span="12">
-                    <el-row justify="end">
-                        <div class="add-button">
-                            <el-button type="success" @click="handleAdd()">新建</el-button>
-                        </div>
+                        <el-button type="success" @click="handleAdd()">新建</el-button>
                     </el-row>
                 </el-col>
             </el-row>
@@ -46,16 +40,31 @@
 
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建总表' : '编辑总表'" width="40%">
         <el-form ref="sumForm" :model="sumForm" label-width="120px" :label-position="'right'">
-            <el-form-item v-for="(itemName, itemLabel) in itemMap.displayItems" :key="itemName" :label="itemLabel" :prop="itemName">
-                <el-input v-if="operation === 'add'" v-model="sumForm[itemName]"></el-input>
-                <el-input v-else-if="operation !== 'add' && itemName === 'stage'" :modelValue="getDisplayDateFormat(sumForm[itemName])" disabled></el-input>
-                <el-input v-else v-model="sumForm[itemName]" disabled></el-input>
+            <el-form-item label="项目编号" prop="projectNumber">
+                <el-select v-if="operation === 'add'" v-model="sumForm['projectNumber']" filterable :filter-method="filterContractNameList" @change="targetProjectNumber" @focus="getProjectNameList()" @blur="resetList()" placeholder="请选择要新增的项目" style="width: 100%">
+                    <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
+                        <span class="el-option-left">{{ item.projectName }}</span>
+                        <span class="el-option-right">{{ item.projectNumber }}</span>
+                    </el-option>
+                    <template #prefix>
+                        <el-icon size="16px"><i-list /></el-icon>
+                    </template>
+                </el-select>
+                <el-input v-else v-model="sumForm['projectNumber']" disabled> </el-input>
+            </el-form-item>
+            <el-form-item label="项目名称" prop="projectName">
+                <el-input v-if="operation === 'add'" v-model="sumForm['projectName']"></el-input>
+                <el-input v-else v-model="sumForm['projectName']" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="当期年月" prop="stage">
+                <el-input v-if="operation === 'add'" v-model="sumForm['stage']"></el-input>
+                <el-input v-else v-model="sumForm['stage']" disabled></el-input>
             </el-form-item>
             <el-form-item label="实施机构" prop="agency" :rules="rules.required">
                 <el-input v-model="sumForm['agency']"></el-input>
             </el-form-item>
             <el-form-item v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :label="itemLabel" :prop="itemName" :rules="rules.amountRequired">
-                <el-input v-model.number="sumForm[itemName]"></el-input>
+                <el-input v-model="sumForm[itemName]"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -70,20 +79,25 @@
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { httpGetSumList, httpPostSum } from '@/api/sum'
+import { httpGetContractNameList, httpGetDetailOfContractList } from '@/api/contract'
 import { copyObjWhenKeyEqual, transformDateFormat, getDisplayDateFormat } from '@/util/utils'
 
 export default {
     name: 'Sum',
     data() {
         const validAmount = (rule, value, callback) => {
-            if (value < 0) {
-                callback(new Error('金额不能小于零！'))
+            const valueNumber = parseFloat(value)
+            if (!valueNumber && valueNumber !== 0) {
+                callback(new Error('金额必须为数字类型！'))
             }
             callback()
         }
         return {
             searchKeyWord: '',
             searchDate: '',
+            // targetProjectNumber: '',
+            filteredContractNameList: [],
+            contractNameList: [],
             dialogVisible: false,
             index: 0,
             itemMap: {
@@ -123,7 +137,6 @@ export default {
             initSumForm: {
                 projectNumber: '',
                 projectName: '',
-                // projectNumber: '',
                 stage: '',
                 agency: '',
                 paymentBeforeRemittance: '',
@@ -134,16 +147,20 @@ export default {
                 projectImageProgress: ''
             },
             sumForm: {},
+            targetContract: {
+                projectName: '',
+                projectNumber: ''
+            },
             operation: '',
             rules: {
                 required: [{ required: true, message: '请填写实施机构', trigger: 'blur' }],
                 amountRequired: [
                     { required: true, message: '请填写金额', trigger: 'blur' },
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ],
                 amount: [
-                    { type: 'number', message: '金额必须为数字' },
+                    // { type: 'number', message: '金额必须为数字' },
                     { validator: validAmount, trigger: 'blur' }
                 ]
             },
@@ -162,12 +179,44 @@ export default {
                 return a || b || c
             })
         }
+        // async targetProjectNumber(newVal) {
+        //     try {
+        //         const { data } = await httpGetDetailOfContractList({
+        //             projectNumber: newVal
+        //         })
+        //         if (data || data.code === 200) {
+        //             this.targetContract = data.data
+        //         } else {
+        //             ElMessage({ type: 'error', message: data.msg })
+        //         }
+        //     } catch (error) {
+        //         ElMessage({ type: 'error', message: error })
+        //     }
+        // }
     },
     created() {
         this.getDisplayDateFormat = getDisplayDateFormat
         this.getData()
+        // this.getProjectNameList()
     },
     methods: {
+        async targetProjectNumber() {
+            try {
+                console.log('changed')
+                const { data } = await httpGetDetailOfContractList({
+                    projectNumber: this.sumForm.projectNumber
+                })
+                if (data || data.code === 200) {
+                    this.targetContract = data.data
+                    this.sumForm.projectNumber = this.targetContract.projectNumber
+                    this.sumForm.projectName = this.targetContract.projectName
+                } else {
+                    ElMessage({ type: 'error', message: data.msg })
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
         async getData() {
             try {
                 const { data } = await httpGetSumList({
@@ -183,6 +232,32 @@ export default {
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
             }
+        },
+        async getProjectNameList() {
+            try {
+                const { data } = await httpGetContractNameList()
+                this.contractNameList = data.data
+                this.filteredContractNameList = this.contractNameList
+                if (this.filteredContractNameList.length > 0) {
+                    this.targetProjectNumber = this.filteredContractNameList[0].projectNumber
+                }
+            } catch (error) {
+                ElMessage({ type: 'error', message: error })
+            }
+        },
+        filterContractNameList(val) {
+            if (val) {
+                this.filteredContractNameList = this.contractNameList.filter(item => {
+                    const a = item.projectName.includes(val)
+                    const b = item.projectNumber.includes(val)
+                    return a || b
+                })
+            } else {
+                this.filteredContractNameList = this.contractNameList
+            }
+        },
+        resetList() {
+            this.filteredContractNameList = this.contractNameList
         },
         async handleSearch() {
             // if (!this.searchKeyWord || !this.searchDate) {
@@ -214,6 +289,7 @@ export default {
         handleEdit(index, row) {
             this.sumForm = JSON.parse(JSON.stringify(this.initSumForm))
             copyObjWhenKeyEqual(row, this.sumForm)
+            console.log('sumForm', this.sumForm)
             this.index = index
             this.operation = 'update'
             this.dialogVisible = true
@@ -242,6 +318,11 @@ export default {
         },
         async save() {
             try {
+                // this.sumForm['projectNumber'] = this.targetContract['projectNumber']
+                // this.sumForm['projectName'] = this.targetContract['projectName']
+                // console.log('projectNumber', this.targetContract['projectNumber'])
+                // this.sumForm.projectNumber = this.targetContract.projectNumber
+                // console.log('sumForm', this.sumForm)
                 const { data } = await httpPostSum(this.sumForm)
                 if (data || data.code === 200) {
                     ElMessage({ type: 'success', message: '提交成功！' })
@@ -283,5 +364,13 @@ export default {
 }
 .add-button {
     padding-right: 25px;
+}
+.el-option-left {
+    float: left;
+}
+.el-option-right {
+    float: right;
+    color: var(--el-text-color-secondary);
+    font-size: 13px;
 }
 </style>

@@ -15,13 +15,7 @@
                         </el-col>
                         <el-date-picker v-model="searchDate" type="month" placeholder="请选择年月" format="YYYY年MM月"> </el-date-picker>
                         <el-button type="success" @click="handleSearch()">查询</el-button>
-                    </el-row>
-                </el-col>
-                <el-col :span="12">
-                    <el-row justify="end">
-                        <div class="add-button">
-                            <el-button type="success" @click="handleAdd()">新建</el-button>
-                        </div>
+                        <el-button type="success" @click="handleAdd()">新建</el-button>
                     </el-row>
                 </el-col>
             </el-row>
@@ -49,7 +43,7 @@
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="operation === 'add' ? '新建实际收付费记录' : '编辑实际收付费记录'" width="40%">
         <el-form ref="actAccPmtForm" :model="actAccPmtForm" label-width="120px" :label-position="'right'">
             <el-form-item label="项目编号" prop="projectNumber">
-                <el-select v-if="operation === 'add'" v-model="targetProjectNumber" filterable :filter-method="filterContractNameList" @focus="resetList()" @change="changeSelect" @remove-tag="removeTag" placeholder="请选择要新增的项目" style="width: 100%">
+                <el-select v-if="operation === 'add'" v-model="actAccPmtForm['projectNumber']" filterable :filter-method="filterContractNameList" @change="targetProjectNumber" @focus="getProjectNameList()" @blur="resetList()" placeholder="请选择要新增的项目" style="width: 100%">
                     <el-option v-for="item in filteredContractNameList" :key="item.projectNumber" :label="item.projectName" :value="item.projectNumber">
                         <span class="el-option-left">{{ item.projectName }}</span>
                         <span class="el-option-right">{{ item.projectNumber }}</span>
@@ -61,12 +55,16 @@
                 <el-input v-else v-model="actAccPmtForm['projectNumber']" disabled> </el-input>
             </el-form-item>
             <el-form-item label="项目名称" prop="projectName">
-                <el-input v-if="operation === 'add'" v-model="targetContract.projectName"></el-input>
+                <el-input v-if="operation === 'add'" v-model="actAccPmtForm['projectName']"></el-input>
                 <el-input v-else v-model="actAccPmtForm['projectName']" disabled></el-input>
             </el-form-item>
             <el-form-item label="主合同金额总额" prop="contractAmountTotal">
                 <el-input v-if="operation === 'add'" v-model="targetContract.contractAmountTotal"></el-input>
                 <el-input v-else v-model="actAccPmtForm['contractAmountTotal']" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="当期年月" prop="stage">
+                <el-input v-if="operation === 'add'" v-model="actAccPmtForm['stage']"></el-input>
+                <el-input v-else v-model="actAccPmtForm['stage']" disabled></el-input>
             </el-form-item>
             <el-form-item v-for="(itemName, itemLabel) in itemMap.editItems" :key="itemName" :label="itemLabel" :prop="itemName" :rules="rules.amountRequired">
                 <el-input v-model="actAccPmtForm[itemName]"></el-input>
@@ -83,27 +81,27 @@
 </template>
 <script>
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { httpGetActAccPmtList, httpPostActAccPmt, httpGetDetailOfContractList } from '@/api/actualAcceptPayment'
-import { httpGetContractNameList } from '@/api/contract'
-import { transformDateFormat, getDisplayDateFormat } from '@/util/utils'
+import { httpGetActAccPmtList, httpPostActAccPmt } from '@/api/actualAcceptPayment'
+import { httpGetContractNameList, httpGetDetailOfContractList } from '@/api/contract'
+import { copyObjWhenKeyEqual, transformDateFormat, getDisplayDateFormat } from '@/util/utils'
 
 export default {
     name: 'ActualAcceptPayment',
     data() {
         const validAmount = (rule, value, callback) => {
             const valueNumber = parseFloat(value)
-            if (!valueNumber) {
+            if (!valueNumber && valueNumber !== 0) {
                 callback(new Error('金额必须为数字类型！'))
             }
-            if (valueNumber < 0) {
-                callback(new Error('金额不能小于零！'))
-            }
+            // if (valueNumber < 0) {
+            //     callback(new Error('金额不能小于零！'))
+            // }
             callback()
         }
         return {
             filteredContractNameList: [],
             contractNameList: [],
-            targetProjectNumber: '',
+            // targetProjectNumber: '',
             searchKeyWord: '',
             searchDate: '',
             dialogVisible: false,
@@ -197,28 +195,45 @@ export default {
                 const c = item.projectNumber.includes(newVal)
                 return a || b || c
             })
-        },
-        async targetProjectNumber(newVal) {
+        }
+        // async targetProjectNumber(newVal) {
+        //     try {
+        //         const { data } = await httpGetDetailOfContractList({
+        //             projectNumber: newVal
+        //         })
+        //         if (data || data.code === 200) {
+        //             this.targetContract = data.data
+        //         } else {
+        //             ElMessage({ type: 'error', message: data.msg })
+        //         }
+        //     } catch (error) {
+        //         ElMessage({ type: 'error', message: error })
+        //     }
+        // }
+    },
+    created() {
+        this.getDisplayDateFormat = getDisplayDateFormat
+        this.getData()
+        // this.getProjectNameList()
+    },
+    methods: {
+        async targetProjectNumber() {
             try {
+                console.log('changing')
                 const { data } = await httpGetDetailOfContractList({
-                    projectNumber: newVal
+                    projectNumber: this.actAccPmtForm.projectNumber
                 })
                 if (data || data.code === 200) {
                     this.targetContract = data.data
+                    this.actAccPmtForm.projectNumber = this.targetContract.projectNumber
+                    this.actAccPmtForm.projectName = this.targetContract.projectName
                 } else {
                     ElMessage({ type: 'error', message: data.msg })
                 }
             } catch (error) {
                 ElMessage({ type: 'error', message: error })
             }
-        }
-    },
-    created() {
-        this.getDisplayDateFormat = getDisplayDateFormat
-        this.getData()
-        this.getProjectNameList()
-    },
-    methods: {
+        },
         async getData() {
             try {
                 const { data } = await httpGetActAccPmtList({
@@ -289,7 +304,8 @@ export default {
             this.dialogVisible = true
         },
         handleEdit(index, row) {
-            this.actAccPmtForm = row
+            this.actAccPmtForm = JSON.parse(JSON.stringify(this.initActAccPmtForm))
+            copyObjWhenKeyEqual(row, this.actAccPmtForm)
             this.index = index
             this.operation = 'update'
             this.dialogVisible = true

@@ -9,15 +9,27 @@
                             <span class="el-option-right">{{ item.projectNumber }}</span>
                         </el-option>
                         <template #prefix>
-                            <el-icon size="16px"><i-list /></el-icon>
+                            <el-icon size="14px"><i-list /></el-icon>
                         </template>
                     </el-select>
                 </el-row>
             </el-col>
-            <el-col :span="12">
-                <el-row justify="end">
+            <el-col :span="4">
+                <el-row justify="start">
                     <div class="add-button">
                         <el-button type="success" @click="handleSearch()">查询</el-button>
+                    </div>
+                </el-row>
+            </el-col>
+            <el-col :span="4">
+                <el-row justify="start">
+                    <el-input type="text" placeholder="请设置基线(kb)" v-model="inputVal" value=""> </el-input>
+                </el-row>
+            </el-col>
+            <el-col :span="4">
+                <el-row justify="start">
+                    <div class="add-button">
+                        <el-button type="success" @click="handleBaseLine()">设置</el-button>
                     </div>
                 </el-row>
             </el-col>
@@ -55,58 +67,10 @@ export default {
                         cumulateOutcome: 9961.0,
                         accumulatedActualCharges: 0.0,
                         accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-05',
-                        cumulateIncome: 16323.0,
-                        cumulateOutcome: 29180.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-06',
-                        cumulateIncome: 16323.0,
-                        cumulateOutcome: 32970.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-07',
-                        cumulateIncome: 40807.0,
-                        cumulateOutcome: 52914.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-08',
-                        cumulateIncome: 134470.0,
-                        cumulateOutcome: 118550.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-09',
-                        cumulateIncome: 220036.0,
-                        cumulateOutcome: 208235.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-10',
-                        cumulateIncome: 363036.0,
-                        cumulateOutcome: 334229.0,
-                        accumulatedActualCharges: 0.0,
-                        accumulatedActualPayment: 0.0
-                    },
-                    {
-                        stage: '2021-11',
-                        cumulateIncome: 469469.0,
-                        cumulateOutcome: 381614.0,
-                        accumulatedActualCharges: 95379.0,
-                        accumulatedActualPayment: 92992.0
                     }
                 ]
             },
+            inputVal: '',
             stageList: [],
             cumulateIncomeList: [],
             cumulateOutcomeList: [],
@@ -289,22 +253,26 @@ export default {
                     {
                         name: '计划收',
                         type: 'line',
-                        data: this.cumulateIncomeList
+                        data: this.cumulateIncomeList,
+                        smooth: true
                     },
                     {
                         name: '计划付',
                         type: 'line',
-                        data: this.cumulateOutcomeList
+                        data: this.cumulateOutcomeList,
+                        smooth: true
                     },
                     {
                         name: '实际收',
                         type: 'line',
-                        data: this.accumulatedActualChargesList
+                        data: this.accumulatedActualChargesList,
+                        smooth: true
                     },
                     {
                         name: '实际付',
                         type: 'line',
-                        data: this.accumulatedActualPaymentList
+                        data: this.accumulatedActualPaymentList,
+                        smooth: true
                     }
                 ]
             }

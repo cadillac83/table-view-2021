@@ -17,4 +17,7 @@ export const httpPostContract = (data:Object) :AxiosPromise => {
     return post('/contract/save', data)
     // console.log('httpPostContract data:',data)
     // return get('/api/postSuccessful.json', '')
-}  
+} 
+export const httpGetDetailOfContractList = (data:any) :AxiosPromise => {
+    return get('/contract/detail',data)
+}

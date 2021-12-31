@@ -4,17 +4,17 @@
             <el-tab-pane label="建造合同准则" name="first" class="tab-pane">
                 <Contract />
             </el-tab-pane>
-            <el-tab-pane label="现金流表" name="second">
+            <el-tab-pane label="项目计划现金流" name="second">
                 <CashFlow />
             </el-tab-pane>
-            <el-tab-pane label="实际收付费记录表" name="third">
+            <el-tab-pane label="项目实际收付费" name="third">
                 <ActualAcceptPayment />
             </el-tab-pane>
-            <el-tab-pane label="统计图" name="fourth">
-                <Statistics />
-            </el-tab-pane>
-            <el-tab-pane label="输出总表" name="five">
+            <el-tab-pane label="当月计划收付费策划" name="fouth">
                 <Sum />
+            </el-tab-pane>
+            <el-tab-pane label="计划与实际现金流曲线图" name="fifth">
+                <Statistics />
             </el-tab-pane>
         </el-tabs>
     </div>

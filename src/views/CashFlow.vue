@@ -102,12 +102,13 @@ export default {
     data() {
         const validAmount = (rule, value, callback) => {
             const valueNumber = parseFloat(value)
-            if (!valueNumber) {
+            console.log(valueNumber)
+            if (!valueNumber && valueNumber !== 0) {
                 callback(new Error('金额必须为数字类型！'))
             }
-            if (valueNumber < 0) {
-                callback(new Error('金额不能小于零！'))
-            }
+            // if (valueNumber < 0) {
+            //     callback(new Error('金额不能小于零！'))
+            // }
             callback()
         }
         const validStage = (rule, value, callback) => {
